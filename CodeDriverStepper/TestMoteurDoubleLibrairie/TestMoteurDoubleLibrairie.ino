@@ -52,8 +52,8 @@ void setup()
   // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
   // for most applications, and we find that it usually works well.
   //sd.setDecayMode(HPSDDecayMode::AutoMixed);
-  sd.setDecayMode(HPSDDecayMode::Mixed);
-
+  //sd.setDecayMode(HPSDDecayMode::Mixed);
+  sd.setDecayMode(HPSDDecayMode::Slow);
   // Set the current limit. You should change the number here to an appropriate
   // value for your particular system.
   sd.setCurrentMilliamps36v4(1800);
@@ -77,17 +77,18 @@ void setup()
   }
  
 
-  stepper3.setMaxSpeed(500.0);
-  stepper3.setAcceleration(50.0);
-  stepper3.moveTo(5000); 
+  stepper3.setMaxSpeed(10000.0);
+  stepper3.setAcceleration(1000.0);
+  stepper3.moveTo(100000); 
 
 }
 
 
 void loop()
 {
+  uint8_t phase=0;
   stepper3.run();
-  if (stepper3.distanceToGo() == 0)
+ if (stepper3.distanceToGo() == 0)
   {
     stepper3.moveTo(-stepper3.currentPosition());
   }
@@ -114,3 +115,23 @@ void setDirection(bool dir)
   digitalWrite(DirPin, dir);
   delayMicroseconds(1);
 }
+
+
+/*
+  if (stepper3.currentPosition() > 40 && phase == 0)
+  {
+        stepper3.setAcceleration(50.0);
+        phase =1;
+  }*/
+/*
+  if (stepper3.currentPosition() > 1000 && phase == 0)
+  {
+    stepper3.setAcceleration(200.0);
+    phase = 2;
+  }*/
+    
+/*
+  if (stepper3.distanceToGo() == 0)
+  {
+    stepper3.moveTo(-stepper3.currentPosition());
+  }*/
