@@ -14,6 +14,10 @@
 #include <AccelStepper.h>
 #include <Wire.h>
 
+/*
+Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
+https://www.forward.com.au/pfod/Robots/SpeedStepper/index.html
+*/
 const uint8_t DirPin = 2;
 const uint8_t StepPin = 3;
 const uint8_t CSPin = 4;
