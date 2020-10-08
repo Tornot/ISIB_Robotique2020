@@ -56,10 +56,10 @@ void setup()
   sd.setDecayMode(HPSDDecayMode::Slow);
   // Set the current limit. You should change the number here to an appropriate
   // value for your particular system.
-  sd.setCurrentMilliamps36v4(1800);
+  sd.setCurrentMilliamps36v4(2800);
 
   // Set the number of microsteps that correspond to one full step.
-  sd.setStepMode(HPSDStepMode::MicroStep2);
+  sd.setStepMode(HPSDStepMode::MicroStep16);//A definir en fct de Vmax
   Serial.println("Début du test");
  if (sd.verifySettings())
   {
@@ -86,7 +86,7 @@ void setup()
 
 void loop()
 {
-  uint8_t phase=0;
+  //uint8_t phase=0;
   stepper3.run();
  if (stepper3.distanceToGo() == 0)
   {
