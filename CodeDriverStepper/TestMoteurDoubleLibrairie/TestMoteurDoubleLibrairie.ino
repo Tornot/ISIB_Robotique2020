@@ -12,6 +12,7 @@
 #include <SPI.h>
 #include <HighPowerStepperDriver.h>
 #include <AccelStepper.h>
+#include <Wire.h>
 
 const uint8_t DirPin = 2;
 const uint8_t StepPin = 3;
@@ -30,6 +31,8 @@ AccelStepper stepper3(AccelStepper::FULL2WIRE, StepPin, DirPin);
 void setup()
 {
   SPI.begin();
+  Serial.begin(9600);
+  while (!Serial);
   sd.setChipSelectPin(CSPin);
 
   // Drive the STEP and DIR pins low initially.
@@ -48,36 +51,46 @@ void setup()
 
   // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
   // for most applications, and we find that it usually works well.
-  sd.setDecayMode(HPSDDecayMode::AutoMixed);
+  //sd.setDecayMode(HPSDDecayMode::AutoMixed);
+  sd.setDecayMode(HPSDDecayMode::Mixed);
 
   // Set the current limit. You should change the number here to an appropriate
   // value for your particular system.
   sd.setCurrentMilliamps36v4(1800);
 
   // Set the number of microsteps that correspond to one full step.
-  sd.setStepMode(HPSDStepMode::MicroStep1);
+  sd.setStepMode(HPSDStepMode::MicroStep2);
+  Serial.println("Début du test");
+ if (sd.verifySettings())
+  {
+     // Enable the motor outputs.
+      sd.enableDriver();
+      Serial.print("Status register is good = ");
+      Serial.println(sd.readStatus());
+  }
+  else 
+  {
+    //Check if the settings were correctly set.
+    //If we see that the verify settings are not ok, do something
+    Serial.println("VerifySettings returned wrong, status register = ");
+    Serial.println(sd.readStatus());
+  }
+ 
 
-  // Enable the motor outputs.
-  sd.enableDriver();
-
-  stepper3.setMaxSpeed(1000.0);
-  stepper3.setAcceleration(100.0);
-  stepper3.moveTo(2000); 
+  stepper3.setMaxSpeed(500.0);
+  stepper3.setAcceleration(50.0);
+  stepper3.moveTo(5000); 
 
 }
+
 
 void loop()
 {
   stepper3.run();
-  if (stepper3.currentPosition() == 2000)
+  if (stepper3.distanceToGo() == 0)
   {
-    stepper3.moveTo(0);
+    stepper3.moveTo(-stepper3.currentPosition());
   }
-  if (stepper3.currentPosition() == 0)
-  {
-    stepper3.moveTo(2000);
-  }
-
 }
 
 // Sends a pulse on the STEP pin to tell the driver to take one step, and also
