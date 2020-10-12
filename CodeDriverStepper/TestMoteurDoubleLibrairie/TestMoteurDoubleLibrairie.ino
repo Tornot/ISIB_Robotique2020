@@ -85,7 +85,7 @@ void setup()
 
   stepper3.setMaxSpeed(10000.0);
   stepper3.setAcceleration(1000.0);
-  stepper3.moveTo(100000); 
+  stepper3.moveTo(10000); 
 
 }
 
