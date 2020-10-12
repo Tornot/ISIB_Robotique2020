@@ -1,4 +1,4 @@
-
+//Commentaire destiné à la seconde release
 // This example shows basic use of a Pololu High Power Stepper Motor Driver.
 //
 // It shows how to initialize the driver, configure various settings, and enable
