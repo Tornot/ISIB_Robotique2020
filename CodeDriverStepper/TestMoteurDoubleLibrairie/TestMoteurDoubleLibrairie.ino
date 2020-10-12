@@ -63,7 +63,7 @@ void setup()
   sd.setCurrentMilliamps36v4(2800);
 
   // Set the number of microsteps that correspond to one full step.
-  sd.setStepMode(HPSDStepMode::MicroStep16);//A definir en fct de Vmax
+  sd.setStepMode(HPSDStepMode::MicroStep8);//A definir en fct de Vitesse_max
   Serial.println("Début du test");
  if (sd.verifySettings())
   {
