@@ -1,5 +1,4 @@
-// NIELS EST LE BOSS
-// LE BIGBIG BOSS
+
 // This example shows basic use of a Pololu High Power Stepper Motor Driver.
 //
 // It shows how to initialize the driver, configure various settings, and enable
@@ -84,7 +83,7 @@ void setup()
  
 
   stepper3.setMaxSpeed(10000.0);
-  stepper3.setAcceleration(1000.0);
+  stepper3.setAcceleration(3000.0);
   stepper3.moveTo(100000); 
 
 }
