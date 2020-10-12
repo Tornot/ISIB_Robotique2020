@@ -96,6 +96,7 @@ void loop()
  if (stepper3.distanceToGo() == 0)
   {
     stepper3.moveTo(-stepper3.currentPosition());
+    delay(1000);
   }
 }
 
