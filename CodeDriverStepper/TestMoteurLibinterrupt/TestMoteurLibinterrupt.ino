@@ -1,19 +1,14 @@
-//Commentaire destiné à la seconde release
-// This example shows basic use of a Pololu High Power Stepper Motor Driver.
-//
-// It shows how to initialize the driver, configure various settings, and enable
-// the driver.  It shows how to send pulses to the STEP pin to step the motor
-// and how to switch directions using the DIR pin.
-//
-// Before using this example, be sure to change the setCurrentMilliamps36v4 line
-// to have an appropriate current limit for your system.  Also, see this
-// library's documentation for information about how to connect the driver:
-//   http://pololu.github.io/high-power-stepper-driver
 
 #include <SPI.h>
 #include <HighPowerStepperDriver.h>
 #include <AccelStepper.h>
 #include <Wire.h>
+#include <SimpleStepper.h>
+
+#define MOTORSTEPS 1600        // 360/1.8 = 200 full steps * 16 microsteps = number of steps per revolution 
+#define CLOCKWISE 1            // Rotation of the stepper motor, reverse if it is swapped
+#define ANTICW 0               // Rotation of the stepper motor, reverse if it is swapped
+
 
 /*
 Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
@@ -31,7 +26,8 @@ const uint16_t StepPeriodUs = 2000;
 
 HighPowerStepperDriver sd;
 
-AccelStepper stepper3(AccelStepper::FULL2WIRE, StepPin, DirPin);
+SimpleStepper stepper(DirPin, StepPin);
+uint8_t counter = 0;
 
 void setup()
 {
@@ -82,62 +78,39 @@ void setup()
   }
  
 
-  stepper3.setMaxSpeed(100.0);
-  stepper3.setAcceleration(10.0);
-  stepper3.moveTo(5000); 
+stepper.init();
 
 }
-
-
 void loop()
 {
-  //uint8_t phase=0;
-  stepper3.run();
- if (stepper3.distanceToGo() == 0)
-  {
-    stepper3.moveTo(-stepper3.currentPosition());
-    delay(1000);
+  
+
+  //once the stepper finished stepping to remaining ticks/steps
+  if(stepper.isStopped()){
+
+    //conter is even number
+    if(counter % 2 == 0){
+      //do a full rotation clockwise at 20rpm
+      stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+    } else {
+      //do a full rotation clockwise at 10rpm
+      stepper.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
+    }
+
+    ++counter;
+  }
+
+  if(counter == 100){
+    //stop whatever the stepper is doing
+    stepper.stop();
   }
 }
 
-// Sends a pulse on the STEP pin to tell the driver to take one step, and also
-//delays to control the speed of the motor.
-void step()
-{
-  // The STEP minimum high pulse width is 1.9 microseconds.
-  digitalWrite(StepPin, HIGH);
-  delayMicroseconds(3);
-  digitalWrite(StepPin, LOW);
-  delayMicroseconds(3);
+//rpm to stepper tick in micro seconds
+long rpmToTickInterval(long targetRPM){
+    // rotation per sec = targetRPM/60
+    float stepsPerSecond = (float) targetRPM/60 * MOTORSTEPS;
+    long pulseInMicroseconds = (long) (1000000L/stepsPerSecond) / 2;
+
+    return pulseInMicroseconds;
 }
-
-// Writes a high or low value to the direction pin to specify what direction to
-// turn the motor.
-void setDirection(bool dir)
-{
-  // The STEP pin must not change for at least 200 nanoseconds before and after
-  // changing the DIR pin.
-  delayMicroseconds(1);
-  digitalWrite(DirPin, dir);
-  delayMicroseconds(1);
-}
-
-
-/*
-  if (stepper3.currentPosition() > 40 && phase == 0)
-  {
-        stepper3.setAcceleration(50.0);
-        phase =1;
-  }*/
-/*
-  if (stepper3.currentPosition() > 1000 && phase == 0)
-  {
-    stepper3.setAcceleration(200.0);
-    phase = 2;
-  }*/
-    
-/*
-  if (stepper3.distanceToGo() == 0)
-  {
-    stepper3.moveTo(-stepper3.currentPosition());
-  }*/
