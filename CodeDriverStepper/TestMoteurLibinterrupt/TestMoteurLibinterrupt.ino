@@ -29,6 +29,23 @@ HighPowerStepperDriver sd;
 SimpleStepper stepper(DirPin, StepPin);
 uint8_t counter = 0;
 
+struct Coordinates//coordonees en float 
+{
+    float coordX;
+    float coordY;
+    float coordZ;
+}coordinates;
+
+
+
+
+
+
+void DataReception();
+void AccelCompute(struct Coordinates*);
+void TimerModif();
+
+
 void setup()
 {
   SPI.begin();
@@ -81,6 +98,23 @@ void setup()
 stepper.init();
 
 }
+
+void loop()
+{
+  //DataReception (coord)
+  DataReception();
+
+  //Compute speed and acceleration
+  //=> IN: coordinates, from a tab
+  AccelCompute(&coordinates);
+
+
+  //Modification of timer values => use a variable wich the timer will take at each tick
+  TimerModif();
+
+}
+
+/*
 void loop()
 {
   
@@ -100,7 +134,7 @@ void loop()
     ++counter;
   }
 
-  if(counter == 100){
+  if(counter == 10){
     //stop whatever the stepper is doing
     stepper.stop();
   }
@@ -114,3 +148,11 @@ long rpmToTickInterval(long targetRPM){
 
     return pulseInMicroseconds;
 }
+*/
+
+void DataReception()
+{}
+void AccelCompute(struct Coordinates*)
+{}
+void TimerModif()
+{}
