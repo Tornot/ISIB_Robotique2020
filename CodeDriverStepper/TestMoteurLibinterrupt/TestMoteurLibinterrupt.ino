@@ -31,7 +31,7 @@ struct Coordinates//coordonees en float
     float coordX;
     float coordY;
     float coordZ;
-}coordinates;
+}nextCoordinates, actualCoordinates;
 
 void DataReception();
 void AccelCompute(struct Coordinates*);
@@ -94,7 +94,7 @@ stepper.init();
 /*
 void loop()
 {
-  //DataReception (coord)
+  //DataReception (coordonnées, formattée de manière 'X', float, 'Y', float, 'Z', float)
   DataReception();
 
   //Compute speed and acceleration

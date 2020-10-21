@@ -5,7 +5,7 @@
 //Variables Declaration
 
 
-
+extern struct Coordinates coordinates;
 
 
 //Functions declaration
