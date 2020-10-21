@@ -56,9 +56,9 @@ void setup()
 
   // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
   // for most applications, and we find that it usually works well.
-  //sd.setDecayMode(HPSDDecayMode::AutoMixed);
+  sd.setDecayMode(HPSDDecayMode::AutoMixed);
   //sd.setDecayMode(HPSDDecayMode::Mixed);
-  sd.setDecayMode(HPSDDecayMode::Slow);
+  //sd.setDecayMode(HPSDDecayMode::Slow);
   // Set the current limit. You should change the number here to an appropriate
   // value for your particular system.
   sd.setCurrentMilliamps36v4(2800);

@@ -4,8 +4,10 @@
 #include <AccelStepper.h>
 #include <Wire.h>
 #include <SimpleStepper.h>
+#include "TimersFct.h"
 
-#define MOTORSTEPS 1600        // 360/1.8 = 200 full steps * 16 microsteps = number of steps per revolution 
+
+#define MOTORSTEPS 51200        // 360/1.8 = 200 full steps * 16 microsteps = number of steps per revolution 
 #define CLOCKWISE 1            // Rotation of the stepper motor, reverse if it is swapped
 #define ANTICW 0               // Rotation of the stepper motor, reverse if it is swapped
 
@@ -18,11 +20,6 @@ const uint8_t DirPin = 2;
 const uint8_t StepPin = 3;
 const uint8_t CSPin = 4;
 
-// This period is the length of the delay between steps, which controls the
-// stepper motor's speed.  You can increase the delay to make the stepper motor
-// go slower.  If you decrease the delay, the stepper motor will go faster, but
-// there is a limit to how fast it can go before it starts missing steps.
-const uint16_t StepPeriodUs = 2000;
 
 HighPowerStepperDriver sd;
 
@@ -35,11 +32,6 @@ struct Coordinates//coordonees en float
     float coordY;
     float coordZ;
 }coordinates;
-
-
-
-
-
 
 void DataReception();
 void AccelCompute(struct Coordinates*);
@@ -69,15 +61,15 @@ void setup()
 
   // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
   // for most applications, and we find that it usually works well.
-  //sd.setDecayMode(HPSDDecayMode::AutoMixed);
+  sd.setDecayMode(HPSDDecayMode::AutoMixed);
   //sd.setDecayMode(HPSDDecayMode::Mixed);
-  sd.setDecayMode(HPSDDecayMode::Slow);
+  //sd.setDecayMode(HPSDDecayMode::Slow);
   // Set the current limit. You should change the number here to an appropriate
   // value for your particular system.
   sd.setCurrentMilliamps36v4(2800);
 
   // Set the number of microsteps that correspond to one full step.
-  sd.setStepMode(HPSDStepMode::MicroStep8);//A definir en fct de Vitesse_max
+  sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
   Serial.println("Début du test");
  if (sd.verifySettings())
   {
@@ -99,6 +91,7 @@ stepper.init();
 
 }
 
+/*
 void loop()
 {
   //DataReception (coord)
@@ -113,8 +106,8 @@ void loop()
   TimerModif();
 
 }
+*/
 
-/*
 void loop()
 {
   
@@ -148,7 +141,7 @@ long rpmToTickInterval(long targetRPM){
 
     return pulseInMicroseconds;
 }
-*/
+
 
 void DataReception()
 {}
