@@ -26,6 +26,8 @@ void DataReception()
                 {
                     fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for X 
                     tempCoordinates.coordX = fCoord;
+                    Serial.print('x');
+                    Serial.print(fCoord);
                 }
             break;
 
@@ -34,6 +36,8 @@ void DataReception()
                 {
                     fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for Y
                     tempCoordinates.coordY = fCoord;
+                    Serial.print('y');
+                    Serial.print(fCoord);
                 }
             break;
 
@@ -44,6 +48,8 @@ void DataReception()
                     nextCoordinates.coordX = tempCoordinates.coordX;
                     nextCoordinates.coordY = tempCoordinates.coordY;
                     nextCoordinates.coordZ = fCoord;
+                    Serial.print('z');
+                    Serial.print(fCoord);
                 }
             break;
 

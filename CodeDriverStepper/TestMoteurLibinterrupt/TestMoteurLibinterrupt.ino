@@ -4,6 +4,7 @@
 #include <AccelStepper.h>
 #include <Wire.h>
 #include <SimpleStepper.h>
+#include "CommFct.h"
 #include "TimersFct.h"
 
 
@@ -31,7 +32,7 @@ struct Coordinates//coordonees en float
     float coordX;
     float coordY;
     float coordZ;
-}nextCoordinates, actualCoordinates;
+}nextCoordinates, actualCoordinates, tempCoordinates;
 
 void DataReception();
 void AccelCompute(struct Coordinates*);
@@ -40,9 +41,8 @@ void TimerModif();
 
 void setup()
 {
-  SPI.begin();
-  Serial.begin(9600);
-  while (!Serial);
+  InitComm();
+  
   sd.setChipSelectPin(CSPin);
 
   // Drive the STEP and DIR pins low initially.
@@ -63,7 +63,7 @@ void setup()
   // for most applications, and we find that it usually works well.
   sd.setDecayMode(HPSDDecayMode::AutoMixed);
   //sd.setDecayMode(HPSDDecayMode::Mixed);
-  //sd.setDecayMode(HPSDDecayMode::Slow);
+  //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
   // Set the current limit. You should change the number here to an appropriate
   // value for your particular system.
   sd.setCurrentMilliamps36v4(2800);
@@ -85,7 +85,6 @@ void setup()
     Serial.println("VerifySettings returned wrong, status register = ");
     Serial.println(sd.readStatus());
   }
- 
 
 stepper.init();
 
@@ -107,7 +106,7 @@ void loop()
 
 }
 */
-
+/*
 void loop()
 {
   
@@ -141,10 +140,9 @@ long rpmToTickInterval(long targetRPM){
 
     return pulseInMicroseconds;
 }
+*/
 
 
-void DataReception()
-{}
 void AccelCompute(struct Coordinates*)
 {}
 void TimerModif()
