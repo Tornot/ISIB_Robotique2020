@@ -1,16 +1,22 @@
+
+
 #ifndef RECEPTION_FCT
 #define RECEPTION_FCT
 
-#define timeoutTime 50
+//#include <SPI.h>
+
+
 
 //Variables Declaration
 
-extern struct Coordinates nextCoordinates, actualCoordinates;
+extern struct Coordinates nextCoordinates;
+extern struct Coordinates actualCoordinates;
+extern struct Coordinates tempCoordinates;
 
 
 //Functions declaration
-void InitComm();
-void DataReception();
+//void InitComm();
+//void DataReception();
 
 
 #endif

@@ -1,17 +1,15 @@
 
 #include <SPI.h>
 #include <HighPowerStepperDriver.h>
-#include <AccelStepper.h>
-#include <Wire.h>
 #include <SimpleStepper.h>
 #include "CommFct.h"
-#include "TimersFct.h"
-
+//#include "TimersFct.h"
 
 #define MOTORSTEPS 51200        // 360/1.8 = 200 full steps * 16 microsteps = number of steps per revolution 
 #define CLOCKWISE 1            // Rotation of the stepper motor, reverse if it is swapped
 #define ANTICW 0               // Rotation of the stepper motor, reverse if it is swapped
 
+#define timeoutTime 50
 
 /*
 Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
@@ -41,52 +39,55 @@ void TimerModif();
 
 void setup()
 {
-  InitComm();
-  
-  sd.setChipSelectPin(CSPin);
+    Serial.begin(9600);
+    while (!Serial);
+    Serial.setTimeout(timeoutTime);//Used for parsefloat timeout. A value juste a little higher than the time interval of the data received is probably a good value.
 
-  // Drive the STEP and DIR pins low initially.
-  pinMode(StepPin, OUTPUT);
-  digitalWrite(StepPin, LOW);
-  pinMode(DirPin, OUTPUT);
-  digitalWrite(DirPin, LOW);
+    SPI.begin();
+    sd.setChipSelectPin(CSPin);
 
-  // Give the driver some time to power up.
-  delay(1);
+    // Drive the STEP and DIR pins low initially.
+    pinMode(StepPin, OUTPUT);
+    digitalWrite(StepPin, LOW);
+    pinMode(DirPin, OUTPUT);
+    digitalWrite(DirPin, LOW);
 
-  // Reset the driver to its default settings and clear latched status
-  // conditions.
-  sd.resetSettings();
-  sd.clearStatus();
+    // Give the driver some time to power up.
+    delay(1);
 
-  // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
-  // for most applications, and we find that it usually works well.
-  sd.setDecayMode(HPSDDecayMode::AutoMixed);
-  //sd.setDecayMode(HPSDDecayMode::Mixed);
-  //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
-  // Set the current limit. You should change the number here to an appropriate
-  // value for your particular system.
-  sd.setCurrentMilliamps36v4(2800);
+    // Reset the driver to its default settings and clear latched status
+    // conditions.
+    sd.resetSettings();
+    sd.clearStatus();
 
-  // Set the number of microsteps that correspond to one full step.
-  sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
-  Serial.println("Début du test");
- if (sd.verifySettings())
-  {
-     // Enable the motor outputs.
-      sd.enableDriver();
-      Serial.print("Status register is good = ");
-      Serial.println(sd.readStatus());
-  }
-  else 
-  {
-    //Check if the settings were correctly set.
-    //If we see that the verify settings are not ok, do something
-    Serial.println("VerifySettings returned wrong, status register = ");
-    Serial.println(sd.readStatus());
-  }
+    // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
+    // for most applications, and we find that it usually works well.
+    sd.setDecayMode(HPSDDecayMode::AutoMixed);
+    //sd.setDecayMode(HPSDDecayMode::Mixed);
+    //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
+    // Set the current limit. You should change the number here to an appropriate
+    // value for your particular system.
+    sd.setCurrentMilliamps36v4(2800);
 
-stepper.init();
+    // Set the number of microsteps that correspond to one full step.
+    sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
+    Serial.println("Début du test");
+    if (sd.verifySettings())
+    {
+        // Enable the motor outputs.
+        sd.enableDriver();
+        Serial.print("Status register is good = ");
+        Serial.println(sd.readStatus());
+    }
+    else 
+    {
+        //Check if the settings were correctly set.
+        //If we see that the verify settings are not ok, do something
+        Serial.println("VerifySettings returned wrong, status register = ");
+        Serial.println(sd.readStatus());
+    }
+
+    stepper.init();
 
 }
 
@@ -106,7 +107,7 @@ void loop()
 
 }
 */
-/*
+
 void loop()
 {
   
@@ -115,9 +116,10 @@ void loop()
   if(stepper.isStopped()){
 
     //conter is even number
-    if(counter % 2 == 0){
+    //if(counter % 2 == 0){
+    if(1){
       //do a full rotation clockwise at 20rpm
-      stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+      stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(50));
     } else {
       //do a full rotation clockwise at 10rpm
       stepper.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
@@ -140,10 +142,55 @@ long rpmToTickInterval(long targetRPM){
 
     return pulseInMicroseconds;
 }
-*/
+
 
 
 void AccelCompute(struct Coordinates*)
 {}
 void TimerModif()
 {}
+
+
+void DataReception()
+{
+    if (Serial.available())
+    {
+        char cData;
+        float fCoord;
+        cData = Serial.read();
+        switch (cData)    //Get coordinates and change them together
+        {
+            case 'x':
+                if (Serial.available())
+                {
+                    fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for X 
+                    tempCoordinates.coordX = fCoord;
+                }
+            break;
+
+            case 'y':
+                if (Serial.available())
+                {
+                    fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for Y
+                    tempCoordinates.coordY = fCoord;
+                }
+            break;
+
+            case 'z':
+                if (Serial.available())
+                {
+                    fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for Z
+                    nextCoordinates.coordX = tempCoordinates.coordX;
+                    nextCoordinates.coordY = tempCoordinates.coordY;
+                    nextCoordinates.coordZ = fCoord;
+                }
+            break;
+
+            default:
+            //There is an error during the reception of data, handle it!!
+            Serial.println("Error during acquisition of coordinates");
+            Serial.println("Please do something!");
+            break;
+        }
+    }
+}

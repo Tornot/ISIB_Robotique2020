@@ -1,4 +1,4 @@
-
+#include <SPI.h>
 #include <Wire.h>
 #include "CommFct.h"
 
@@ -17,9 +17,9 @@ void DataReception()
     if (Serial.available())
     {
         char cData;
-        float fCoord
-        data = Serial.read()
-        switch cData    //Get coordinates and change them together
+        float fCoord;
+        cData = Serial.read();
+        switch (cData)    //Get coordinates and change them together
         {
             case 'x':
                 if (Serial.available())
