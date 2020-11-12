@@ -1,15 +1,23 @@
 
+#include "GlobalStructures.h"
 #include <SPI.h>
 #include <HighPowerStepperDriver.h>
-#include <SimpleStepper.h>
+#include "SimpleStepper.h"
 #include "CommFct.h"
-//#include "TimersFct.h"
+#include "CalculStepMotor.h"
+/*
+POUR L'INSTANT, ON PEUT COMPILER EN METTANT EN COMMENTAIRE L'INCLUDE DE :
+CalculStepMotor.h"
+*/
 
 #define MOTORSTEPS 51200        // 360/1.8 = 200 full steps * 16 microsteps = number of steps per revolution 
-#define CLOCKWISE 1            // Rotation of the stepper motor, reverse if it is swapped
-#define ANTICW 0               // Rotation of the stepper motor, reverse if it is swapped
+#define CLOCKWISE 1             // Rotation of the stepper motor, reverse if it is swapped
+#define ANTICW 0                // Rotation of the stepper motor, reverse if it is swapped
+#define MAXSPEED 10000          //Maximal speed in step/second !!!!NEED TO DO SOME CALCULATION TO DEFINE CORRECTLY
+#define MAXACCEL 100            //Maximal acceleration in step/s^2
 
-#define timeoutTime 50
+
+
 
 /*
 Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
@@ -25,25 +33,23 @@ HighPowerStepperDriver sd;
 SimpleStepper stepper(DirPin, StepPin);
 uint8_t counter = 0;
 
-struct Coordinates//coordonees en float 
-{
-    float coordX;
-    float coordY;
-    float coordZ;
-}nextCoordinates, actualCoordinates, tempCoordinates;
+Coordinates nextCoordinates = {0,0,0};
+Coordinates actualCoordinates = {0,0,0}; 
+Coordinates tempCoordinates = {0,0,0};
+
+Steps MotorStep = {0,0,0};
+double A = 30;//j'ai mis 30 oklm en attendant
+double B = 10;//j'ai mis 10 oklm en attendant
+
 
 void DataReception();
-void AccelCompute(struct Coordinates*);
+void AccelCompute(Coordinates*);
 void TimerModif();
 
 
 void setup()
 {
-    Serial.begin(9600);
-    while (!Serial);
-    Serial.setTimeout(timeoutTime);//Used for parsefloat timeout. A value juste a little higher than the time interval of the data received is probably a good value.
-
-    SPI.begin();
+    
     sd.setChipSelectPin(CSPin);
 
     // Drive the STEP and DIR pins low initially.
@@ -89,6 +95,7 @@ void setup()
 
     stepper.init();
 
+    FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates,MotorStep);
 }
 
 /*
@@ -110,6 +117,7 @@ void loop()
 
 void loop()
 {
+
   
 
   //once the stepper finished stepping to remaining ticks/steps
@@ -117,20 +125,49 @@ void loop()
 
     //conter is even number
     //if(counter % 2 == 0){
-    if(1){
-      //do a full rotation clockwise at 20rpm
-      stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(50));
-    } else {
-      //do a full rotation clockwise at 10rpm
-      stepper.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
+    switch (counter)
+    {
+        case 0:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
+        break;
+        case 1:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+        break;
+        case 2:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
+        break;
+        case 3: 
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
+        break;
+        case 4:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(50));
+        break;
+        case 5:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(60));
+        break;
+        case 6:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(70));
+        break;
+        case 7:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(80));
+        break;
+        case 8:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(90));
+        break;
+        case 9:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(100));
+        break;
+        case 10:
+            stepper.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(110));
+        break;
     }
-
     ++counter;
   }
 
   if(counter == 10){
     //stop whatever the stepper is doing
     stepper.stop();
+    while(1);
   }
 }
 
@@ -145,52 +182,9 @@ long rpmToTickInterval(long targetRPM){
 
 
 
-void AccelCompute(struct Coordinates*)
+void AccelCompute(Coordinates*)
 {}
 void TimerModif()
 {}
 
 
-void DataReception()
-{
-    if (Serial.available())
-    {
-        char cData;
-        float fCoord;
-        cData = Serial.read();
-        switch (cData)    //Get coordinates and change them together
-        {
-            case 'x':
-                if (Serial.available())
-                {
-                    fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for X 
-                    tempCoordinates.coordX = fCoord;
-                }
-            break;
-
-            case 'y':
-                if (Serial.available())
-                {
-                    fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for Y
-                    tempCoordinates.coordY = fCoord;
-                }
-            break;
-
-            case 'z':
-                if (Serial.available())
-                {
-                    fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for Z
-                    nextCoordinates.coordX = tempCoordinates.coordX;
-                    nextCoordinates.coordY = tempCoordinates.coordY;
-                    nextCoordinates.coordZ = fCoord;
-                }
-            break;
-
-            default:
-            //There is an error during the reception of data, handle it!!
-            Serial.println("Error during acquisition of coordinates");
-            Serial.println("Please do something!");
-            break;
-        }
-    }
-}

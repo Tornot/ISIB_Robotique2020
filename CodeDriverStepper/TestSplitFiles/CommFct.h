@@ -4,13 +4,17 @@
 #define COMM_FCT
 
 #include <SPI.h>
-#include "GlobalStructures.h"
+#include "GlobalStruct.h"
 
 #define TIMEOUTTIME 50
 
+//Variables Declaration
+
+
+
 //Functions declaration
 void InitComm();
-void DataReception();
+void DataReception(struct Coordinates *nextCoordinates);
 
 
 #endif
