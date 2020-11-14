@@ -5,18 +5,22 @@
 #include "SimpleStepper.h"
 #include "CommFct.h"
 #include "CalculStepMotor.h"
-/*
-POUR L'INSTANT, ON PEUT COMPILER EN METTANT EN COMMENTAIRE L'INCLUDE DE :
-CalculStepMotor.h"
-*/
+
 
 #define MOTORSTEPS 51200        // 360/1.8 = 200 full steps * 16 microsteps = number of steps per revolution 
 #define CLOCKWISE 1             // Rotation of the stepper motor, reverse if it is swapped
 #define ANTICW 0                // Rotation of the stepper motor, reverse if it is swapped
-#define MAXSPEED 10000          //Maximal speed in step/second !!!!NEED TO DO SOME CALCULATION TO DEFINE CORRECTLY
-#define MAXACCEL 100            //Maximal acceleration in step/s^2
+#define MAXSPEED 10000          // Maximal speed in step/second !!!!NEED TO DO SOME CALCULATION TO DEFINE CORRECTLY
+#define MAXACCEL 100            // Maximal acceleration in step/s^2
+#define TIMETOREACH 5           //Time in ms to reach to target point
+
+/*
 
 
+
+
+
+*/
 
 
 /*
@@ -42,10 +46,7 @@ double A = 30;//j'ai mis 30 oklm en attendant
 double B = 10;//j'ai mis 10 oklm en attendant
 
 
-void DataReception();
-void AccelCompute(Coordinates*);
-void TimerModif();
-
+long rpmToTickInterval(long targetRPM);
 
 void setup()
 {
@@ -182,9 +183,7 @@ long rpmToTickInterval(long targetRPM){
 
 
 
-void AccelCompute(Coordinates*)
-{}
-void TimerModif()
-{}
+
+
 
 
