@@ -4,6 +4,5 @@
 //Il faut
 void AccelCompute(uint8_t timeToReach)
 {
-
     while(0);
 }

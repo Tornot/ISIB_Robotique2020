@@ -1,5 +1,5 @@
 /*
- *  Interrupt and PWM utilities for 16 bit Timer1 on ATmega168/328
+ *  Interrupt and PWM utilities for 16 bit Timer3 on ATmega168/328
  *  Original code by Jesse Tane for http://labs.ideo.com August 2008
  *  Modified March 2009 by Jérôme Despatis and Jesse Tane for ATmega328 support
  *  Modified June 2009 by Michael Polli and Jesse Tane to fix a bug in setPeriod() which caused the timer to stop
@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef TimerOne_h_
-#define TimerOne_h_
+#ifndef TimerThree_h_
+#define TimerThree_h_
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
@@ -26,11 +26,11 @@
 
 #include "config/known_16bit_timers.h"
 #if defined (__AVR_ATtiny85__)
-#define TIMER1_RESOLUTION 256UL  // Timer1 is 8 bit
+#define TIMER3_RESOLUTION 256UL  // Timer3 is 8 bit
 #elif defined(__AVR__)
-#define TIMER1_RESOLUTION 65536UL  // Timer1 is 16 bit
+#define TIMER3_RESOLUTION 65536UL  // Timer3 is 16 bit
 #else
-#define TIMER1_RESOLUTION 65536UL  // assume 16 bits for non-AVR chips
+#define TIMER3_RESOLUTION 65536UL  // assume 16 bits for non-AVR chips
 #endif
 
 // Placing nearly all the code in this .h file allows the functions to be
@@ -39,7 +39,7 @@
 // to the hardware registers (for example, setPeriod).
 
 
-class TimerOne
+class TimerThree
 {
 
 #if defined (__AVR_ATtiny85__)
@@ -48,96 +48,96 @@ class TimerOne
     //  Configuration
     //****************************
     void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
-	TCCR1 = _BV(CTC1);              //clear timer1 when it matches the value in OCR1C
-	TIMSK |= _BV(OCIE1A);           //enable interrupt when OCR1A matches the timer value
+	TCCR3 = _BV(CTC3);              //clear timer1 when it matches the value in OCR3C
+	TIMSK |= _BV(OCIE3A);           //enable interrupt when OCR3A matches the timer value
 	setPeriod(microseconds);
     }
  //    void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {		
 	// const unsigned long cycles = microseconds * ratio;
-	// if (cycles < TIMER1_RESOLUTION) {
+	// if (cycles < TIMER3_RESOLUTION) {
 	// 	clockSelectBits = _BV(CS10);
 	// 	pwmPeriod = cycles;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 2UL) {
+	// if (cycles < TIMER3_RESOLUTION * 2UL) {
 	// 	clockSelectBits = _BV(CS11);
 	// 	pwmPeriod = cycles / 2;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 4UL) {
+	// if (cycles < TIMER3_RESOLUTION * 4UL) {
 	// 	clockSelectBits = _BV(CS11) | _BV(CS10);
 	// 	pwmPeriod = cycles / 4;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 8UL) {
+	// if (cycles < TIMER3_RESOLUTION * 8UL) {
 	// 	clockSelectBits = _BV(CS12);
 	// 	pwmPeriod = cycles / 8;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 16UL) {
+	// if (cycles < TIMER3_RESOLUTION * 16UL) {
 	// 	clockSelectBits = _BV(CS12) | _BV(CS10);
 	// 	pwmPeriod = cycles / 16;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 32UL) {
+	// if (cycles < TIMER3_RESOLUTION * 32UL) {
 	// 	clockSelectBits = _BV(CS12) | _BV(CS11);
 	// 	pwmPeriod = cycles / 32;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 64UL) {
+	// if (cycles < TIMER3_RESOLUTION * 64UL) {
 	// 	clockSelectBits = _BV(CS12) | _BV(CS11) | _BV(CS10);
 	// 	pwmPeriod = cycles / 64UL;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 128UL) {
+	// if (cycles < TIMER3_RESOLUTION * 128UL) {
 	// 	clockSelectBits = _BV(CS13);
 	// 	pwmPeriod = cycles / 128;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 256UL) {
+	// if (cycles < TIMER3_RESOLUTION * 256UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS10);
 	// 	pwmPeriod = cycles / 256;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 512UL) {
+	// if (cycles < TIMER3_RESOLUTION * 512UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS11);
 	// 	pwmPeriod = cycles / 512;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 1024UL) {
+	// if (cycles < TIMER3_RESOLUTION * 1024UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS11) | _BV(CS10);
 	// 	pwmPeriod = cycles / 1024;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 2048UL) {
+	// if (cycles < TIMER3_RESOLUTION * 2048UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS12);
 	// 	pwmPeriod = cycles / 2048;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 4096UL) {
+	// if (cycles < TIMER3_RESOLUTION * 4096UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS12) | _BV(CS10);
 	// 	pwmPeriod = cycles / 4096;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 8192UL) {
+	// if (cycles < TIMER3_RESOLUTION * 8192UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS12) | _BV(CS11);
 	// 	pwmPeriod = cycles / 8192;
 	// } else
-	// if (cycles < TIMER1_RESOLUTION * 16384UL) {
+	// if (cycles < TIMER3_RESOLUTION * 16384UL) {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS12) | _BV(CS11)  | _BV(CS10);
 	// 	pwmPeriod = cycles / 16384;
 	// } else {
 	// 	clockSelectBits = _BV(CS13) | _BV(CS12) | _BV(CS11)  | _BV(CS10);
-	// 	pwmPeriod = TIMER1_RESOLUTION - 1;
+	// 	pwmPeriod = TIMER3_RESOLUTION - 1;
 	// }
-	// OCR1A = pwmPeriod;
-	// OCR1C = pwmPeriod;
-	// TCCR1 = _BV(CTC1) | clockSelectBits;
+	// OCR3A = pwmPeriod;
+	// OCR3C = pwmPeriod;
+	// TCCR3 = _BV(CTC3) | clockSelectBits;
  //    }
 	
  //    //****************************
  //    //  Run Control
  //    //****************************	
  //    void start() __attribute__((always_inline)) {
-	// TCCR1 = 0;
-	// TCNT1 = 0;		
+	// TCCR3 = 0;
+	// TCNT3 = 0;		
 	// resume();
  //    }
  //    void stop() __attribute__((always_inline)) {
-	// TCCR1 = _BV(CTC1);
+	// TCCR3 = _BV(CTC3);
  //    }
  //    void restart() __attribute__((always_inline)) {
 	// start();
  //    }
  //    void resume() __attribute__((always_inline)) {
-	// TCCR1 = _BV(CTC1) | clockSelectBits;
+	// TCCR3 = _BV(CTC3) | clockSelectBits;
  //    }
 	
  //    //****************************
@@ -151,15 +151,15 @@ class TimerOne
  //    //****************************
  //    void attachInterrupt(void (*isr)()) __attribute__((always_inline)) {
 	// isrCallback = isr;
-	// TIMSK |= _BV(OCIE1A);
+	// TIMSK |= _BV(OCIE3A);
  //    }
  //    void attachInterrupt(void (*isr)(), unsigned long microseconds) __attribute__((always_inline)) {
 	// if(microseconds > 0) setPeriod(microseconds);
 	// attachInterrupt(isr);
  //    }
  //    void detachInterrupt() __attribute__((always_inline)) {
-	// //TIMSK = 0; // Timer 0 and Timer 1 both use TIMSK register so setting it to 0 will override settings for Timer1 as well
-	// TIMSK &= ~_BV(OCIE1A);
+	// //TIMSK = 0; // Timer 0 and Timer 1 both use TIMSK register so setting it to 0 will override settings for Timer3 as well
+	// TIMSK &= ~_BV(OCIE3A);
  //    }
  //    static void (*isrCallback)();
  //    static void isrDefaultUnused();
@@ -175,55 +175,55 @@ class TimerOne
     //  Configuration
     //****************************
     void initialize(unsigned long microseconds=1000000) __attribute__((always_inline)) {
-	TCCR1B = _BV(WGM13);        // set mode as phase and frequency correct pwm, stop the timer
-	TCCR1A = 0;                 // clear control register A 
+	TCCR3B = _BV(WGM13);        // set mode as phase and frequency correct pwm, stop the timer
+	TCCR3A = 0;                 // clear control register A 
 	setPeriod(microseconds);
     }
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
 	const unsigned long cycles = (F_CPU / 2000000) * microseconds;
-	if (cycles < TIMER1_RESOLUTION) {
+	if (cycles < TIMER3_RESOLUTION) {
 		clockSelectBits = _BV(CS10);
 		pwmPeriod = cycles;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 8) {
+	if (cycles < TIMER3_RESOLUTION * 8) {
 		clockSelectBits = _BV(CS11);
 		pwmPeriod = cycles / 8;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 64) {
+	if (cycles < TIMER3_RESOLUTION * 64) {
 		clockSelectBits = _BV(CS11) | _BV(CS10);
 		pwmPeriod = cycles / 64;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 256) {
+	if (cycles < TIMER3_RESOLUTION * 256) {
 		clockSelectBits = _BV(CS12);
 		pwmPeriod = cycles / 256;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 1024) {
+	if (cycles < TIMER3_RESOLUTION * 1024) {
 		clockSelectBits = _BV(CS12) | _BV(CS10);
 		pwmPeriod = cycles / 1024;
 	} else {
 		clockSelectBits = _BV(CS12) | _BV(CS10);
-		pwmPeriod = TIMER1_RESOLUTION - 1;
+		pwmPeriod = TIMER3_RESOLUTION - 1;
 	}
-	ICR1 = pwmPeriod;
-	TCCR1B = _BV(WGM13) | clockSelectBits;
+	ICR3 = pwmPeriod;
+	TCCR3B = _BV(WGM13) | clockSelectBits;
     }
 
     //****************************
     //  Run Control
     //****************************
     void start() __attribute__((always_inline)) {
-	TCCR1B = 0;
-	TCNT1 = 0;		// TODO: does this cause an undesired interrupt?
+	TCCR3B = 0;
+	TCNT3 = 0;		// TODO: does this cause an undesired interrupt?
 	resume();
     }
     void stop() __attribute__((always_inline)) {
-	TCCR1B = _BV(WGM13);
+	TCCR3B = _BV(WGM13);
     }
     void restart() __attribute__((always_inline)) {
 	start();
     }
     void resume() __attribute__((always_inline)) {
-	TCCR1B = _BV(WGM13) | clockSelectBits;
+	TCCR3B = _BV(WGM13) | clockSelectBits;
     }
 
     //****************************
@@ -233,36 +233,36 @@ class TimerOne
 	unsigned long dutyCycle = pwmPeriod;
 	dutyCycle *= duty;
 	dutyCycle >>= 10;
-	if (pin == TIMER1_A_PIN) OCR1A = dutyCycle;
-	#ifdef TIMER1_B_PIN
-	else if (pin == TIMER1_B_PIN) OCR1B = dutyCycle;
+	if (pin == TIMER3_A_PIN) OCR3A = dutyCycle;
+	#ifdef TIMER3_B_PIN
+	else if (pin == TIMER3_B_PIN) OCR3B = dutyCycle;
 	#endif
-	#ifdef TIMER1_C_PIN
-	else if (pin == TIMER1_C_PIN) OCR1C = dutyCycle;
+	#ifdef TIMER3_C_PIN
+	else if (pin == TIMER3_C_PIN) OCR3C = dutyCycle;
 	#endif
     }
     void pwm(char pin, unsigned int duty) __attribute__((always_inline)) {
-	if (pin == TIMER1_A_PIN) { pinMode(TIMER1_A_PIN, OUTPUT); TCCR1A |= _BV(COM1A1); }
-	#ifdef TIMER1_B_PIN
-	else if (pin == TIMER1_B_PIN) { pinMode(TIMER1_B_PIN, OUTPUT); TCCR1A |= _BV(COM1B1); }
+	if (pin == TIMER3_A_PIN) { pinMode(TIMER3_A_PIN, OUTPUT); TCCR3A |= _BV(COM3A1); }
+	#ifdef TIMER3_B_PIN
+	else if (pin == TIMER3_B_PIN) { pinMode(TIMER3_B_PIN, OUTPUT); TCCR3A |= _BV(COM3B1); }
 	#endif
-	#ifdef TIMER1_C_PIN
-	else if (pin == TIMER1_C_PIN) { pinMode(TIMER1_C_PIN, OUTPUT); TCCR1A |= _BV(COM1C1); }
+	#ifdef TIMER3_C_PIN
+	else if (pin == TIMER3_C_PIN) { pinMode(TIMER3_C_PIN, OUTPUT); TCCR3A |= _BV(COM3C1); }
 	#endif
 	setPwmDuty(pin, duty);
-	TCCR1B = _BV(WGM13) | clockSelectBits;
+	TCCR3B = _BV(WGM13) | clockSelectBits;
     }
     void pwm(char pin, unsigned int duty, unsigned long microseconds) __attribute__((always_inline)) {
 	if (microseconds > 0) setPeriod(microseconds);
 	pwm(pin, duty);
     }
     void disablePwm(char pin) __attribute__((always_inline)) {
-	if (pin == TIMER1_A_PIN) TCCR1A &= ~_BV(COM1A1);
-	#ifdef TIMER1_B_PIN
-	else if (pin == TIMER1_B_PIN) TCCR1A &= ~_BV(COM1B1);
+	if (pin == TIMER3_A_PIN) TCCR3A &= ~_BV(COM3A1);
+	#ifdef TIMER3_B_PIN
+	else if (pin == TIMER3_B_PIN) TCCR3A &= ~_BV(COM3B1);
 	#endif
-	#ifdef TIMER1_C_PIN
-	else if (pin == TIMER1_C_PIN) TCCR1A &= ~_BV(COM1C1);
+	#ifdef TIMER3_C_PIN
+	else if (pin == TIMER3_C_PIN) TCCR3A &= ~_BV(COM3C1);
 	#endif
     }
 
@@ -271,14 +271,14 @@ class TimerOne
     //****************************
     void attachInterrupt(void (*isr)()) __attribute__((always_inline)) {
 	isrCallback = isr;
-	TIMSK1 = _BV(TOIE1);
+	TIMSK3 = _BV(TOIE3);
     }
     void attachInterrupt(void (*isr)(), unsigned long microseconds) __attribute__((always_inline)) {
 	if(microseconds > 0) setPeriod(microseconds);
 	attachInterrupt(isr);
     }
     void detachInterrupt() __attribute__((always_inline)) {
-	TIMSK1 = 0;
+	TIMSK3 = 0;
     }
     static void (*isrCallback)();
     static void isrDefaultUnused();
@@ -316,10 +316,10 @@ class TimerOne
  
   /*
   // This code does not work properly in all cases :(
-  // https://github.com/PaulStoffregen/TimerOne/issues/17 
-  if (cycles < TIMER1_RESOLUTION * 16) {
-    if (cycles < TIMER1_RESOLUTION * 4) {
-      if (cycles < TIMER1_RESOLUTION) {
+  // https://github.com/PaulStoffregen/TimerThree/issues/17 
+  if (cycles < TIMER3_RESOLUTION * 16) {
+    if (cycles < TIMER3_RESOLUTION * 4) {
+      if (cycles < TIMER3_RESOLUTION) {
         clockSelectBits = 0;
         pwmPeriod = cycles;
       }else{
@@ -327,7 +327,7 @@ class TimerOne
         pwmPeriod = cycles >> 1;
       }
     }else{
-      if (cycles < TIMER1_RESOLUTION * 8) {
+      if (cycles < TIMER3_RESOLUTION * 8) {
         clockSelectBits = 3;
         pwmPeriod = cycles >> 3;
       }else{
@@ -336,17 +336,17 @@ class TimerOne
       }
     }
   }else{
-    if (cycles > TIMER1_RESOLUTION * 64) {
-      if (cycles > TIMER1_RESOLUTION * 128) {
+    if (cycles > TIMER3_RESOLUTION * 64) {
+      if (cycles > TIMER3_RESOLUTION * 128) {
         clockSelectBits = 7;
-        pwmPeriod = TIMER1_RESOLUTION - 1;
+        pwmPeriod = TIMER3_RESOLUTION - 1;
       }else{
         clockSelectBits = 7;
         pwmPeriod = cycles >> 7;
       }
     }
     else{
-      if (cycles > TIMER1_RESOLUTION * 32) {
+      if (cycles > TIMER3_RESOLUTION * 32) {
         clockSelectBits = 6;
         pwmPeriod = cycles >> 6;
       }else{
@@ -356,40 +356,40 @@ class TimerOne
     }
   }
   *//*
-	if (cycles < TIMER1_RESOLUTION) {
+	if (cycles < TIMER3_RESOLUTION) {
 		clockSelectBits = 0;
 		pwmPeriod = cycles;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 2) {
+	if (cycles < TIMER3_RESOLUTION * 2) {
 		clockSelectBits = 1;
 		pwmPeriod = cycles >> 1;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 4) {
+	if (cycles < TIMER3_RESOLUTION * 4) {
 		clockSelectBits = 2;
 		pwmPeriod = cycles >> 2;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 8) {
+	if (cycles < TIMER3_RESOLUTION * 8) {
 		clockSelectBits = 3;
 		pwmPeriod = cycles >> 3;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 16) {
+	if (cycles < TIMER3_RESOLUTION * 16) {
 		clockSelectBits = 4;
 		pwmPeriod = cycles >> 4;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 32) {
+	if (cycles < TIMER3_RESOLUTION * 32) {
 		clockSelectBits = 5;
 		pwmPeriod = cycles >> 5;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 64) {
+	if (cycles < TIMER3_RESOLUTION * 64) {
 		clockSelectBits = 6;
 		pwmPeriod = cycles >> 6;
 	} else
-	if (cycles < TIMER1_RESOLUTION * 128) {
+	if (cycles < TIMER3_RESOLUTION * 128) {
 		clockSelectBits = 7;
 		pwmPeriod = cycles >> 7;
 	} else {
 		clockSelectBits = 7;
-		pwmPeriod = TIMER1_RESOLUTION - 1;
+		pwmPeriod = TIMER3_RESOLUTION - 1;
 	}
 
 	uint32_t sc = FTM1_SC;
@@ -423,18 +423,18 @@ class TimerOne
 	unsigned long dutyCycle = pwmPeriod;
 	dutyCycle *= duty;
 	dutyCycle >>= 10;
-	if (pin == TIMER1_A_PIN) {
+	if (pin == TIMER3_A_PIN) {
 		FTM1_C0V = dutyCycle;
-	} else if (pin == TIMER1_B_PIN) {
+	} else if (pin == TIMER3_B_PIN) {
 		FTM1_C1V = dutyCycle;
 	}
     }
     void pwm(char pin, unsigned int duty) __attribute__((always_inline)) {
 	setPwmDuty(pin, duty);
-	if (pin == TIMER1_A_PIN) {
-		*portConfigRegister(TIMER1_A_PIN) = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
-	} else if (pin == TIMER1_B_PIN) {
-		*portConfigRegister(TIMER1_B_PIN) = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
+	if (pin == TIMER3_A_PIN) {
+		*portConfigRegister(TIMER3_A_PIN) = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
+	} else if (pin == TIMER3_B_PIN) {
+		*portConfigRegister(TIMER3_B_PIN) = PORT_PCR_MUX(3) | PORT_PCR_DSE | PORT_PCR_SRE;
 	}
     }
     void pwm(char pin, unsigned int duty, unsigned long microseconds) __attribute__((always_inline)) {
@@ -442,10 +442,10 @@ class TimerOne
 	pwm(pin, duty);
     }
     void disablePwm(char pin) __attribute__((always_inline)) {
-	if (pin == TIMER1_A_PIN) {
-		*portConfigRegister(TIMER1_A_PIN) = 0;
-	} else if (pin == TIMER1_B_PIN) {
-		*portConfigRegister(TIMER1_B_PIN) = 0;
+	if (pin == TIMER3_A_PIN) {
+		*portConfigRegister(TIMER3_A_PIN) = 0;
+	} else if (pin == TIMER3_B_PIN) {
+		*portConfigRegister(TIMER3_B_PIN) = 0;
 	}
     }
 
@@ -478,7 +478,7 @@ class TimerOne
 #endif
 };
 
-extern TimerOne Timer1;
+extern TimerThree Timer3;
 
 #endif
 

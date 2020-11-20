@@ -29,6 +29,8 @@
 Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
 https://www.forward.com.au/pfod/Robots/SpeedStepper/index.html
 */
+
+
 const uint8_t DirPin = 2;
 const uint8_t StepPin = 3;
 const uint8_t CSPin = 4;
@@ -43,7 +45,7 @@ Coordinates nextCoordinates = {0,0,0};
 Coordinates actualCoordinates = {0,0,0}; 
 Coordinates tempCoordinates = {0,0,0};
 
-Steps MotorStep = {0,0,0};
+Steps MotorStep = {0,0,0,0};
 double A = 30;//j'ai mis 30 oklm en attendant
 double B = 10;//j'ai mis 10 oklm en attendant
 
@@ -120,8 +122,6 @@ void loop()
 
 void loop()
 {
-
-  
 
   //once the stepper finished stepping to remaining ticks/steps
   if(stepper.isStopped()){
