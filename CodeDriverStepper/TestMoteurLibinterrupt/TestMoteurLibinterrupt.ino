@@ -40,6 +40,7 @@ const uint8_t CSPin1 = 4;
 const uint8_t DirPin2 = 5;
 const uint8_t StepPin2 = 6;
 const uint8_t CSPin2 = 7;
+//!!!!!Pins for motors 3 and 4 are not defined!!!
 const uint8_t DirPin3 = 2;
 const uint8_t StepPin3 = 3;
 const uint8_t CSPin3 = 4;
@@ -51,8 +52,8 @@ const uint8_t CSPin4 = 4;
 HighPowerStepperDriver sd;
 
 
-extern TimerOne Timer1;
-extern TimerThree Timer3;
+//extern TimerOne Timer1;
+//extern TimerThree Timer3;
 //extern TimerFour Timer4;
 //extern TimerFive Timer5;
 
@@ -82,14 +83,10 @@ void setup()
     pinMode(11, OUTPUT);
     pinMode(12, INPUT);
     SPI.begin();
-    Serial.println("Debug1");
     InitDriver1();
-    Serial.println("Debug1.5");
-    //InitDriver2();
-    Serial.println("Debug2");
+    InitDriver2();
     stepper1.init();
-    //stepper2.init();
-    Serial.println("Debug3");
+    stepper2.init();
     FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates,MotorStep);
 }
 
@@ -114,8 +111,7 @@ void loop()
 {
     //once the stepper finished stepping to remaining ticks/steps
     if(stepper1.isStopped()){
-    //conter is even number
-    //if(counter % 2 == 0){
+
     switch (counter)
     {
         case 0:
@@ -128,71 +124,89 @@ void loop()
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
         break;
         case 3: 
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
+            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(35));
         break;
         case 4:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(50));
+            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(35));
         break;
         case 5:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
-        break;
-        case 6:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
         break;
-        case 7:
+        case 6:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
         break;
-        case 8:
+        case 7:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
+        break;
+        case 8:
+            stepper1.step(MOTORSTEPS/2, CLOCKWISE, rpmToTickInterval(5));
+        break;
+        case 9:
+            stepper1.step(MOTORSTEPS/2, ANTICW, rpmToTickInterval(5));
+        break;
+        case 10:
+            stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
+        break;
+        case 11:
+            stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(20));
+        break;
+        case 12:
+            stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(30));
         break;
         default:
         break;
     }
     ++counter;
-  }/*
-  if(stepper1.isStopped()){
-    //conter is even number
-    //if(counter % 2 == 0){
+  }
+  if(stepper2.isStopped()){
+
     switch (counter)
     {
         case 0:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
         break;
         case 1:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
         break;
         case 2:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
         break;
         case 3: 
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
         break;
         case 4:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(50));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
         break;
         case 5:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(60));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
         break;
         case 6:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(50));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
         break;
         case 7:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(40));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
         break;
         case 8:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
+            stepper2.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(5));
         break;
         case 9:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+            stepper2.step(MOTORSTEPS/2, CLOCKWISE, rpmToTickInterval(5));
         break;
         case 10:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
+            stepper2.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
+        break;
+        case 11:
+            stepper2.step(MOTORSTEPS, ANTICW, rpmToTickInterval(20));
+        break;
+        case 12:
+            stepper2.step(MOTORSTEPS, ANTICW, rpmToTickInterval(30));
+        break;
+        default:
         break;
     }
-    ++counter;
+    //++counter;    //In comment for now because otherwisewe hae 2 increment of counter
   }
-*/
-  if(counter >= 9){
+  if(counter >= 14){
     //stop whatever the stepper is doing
     stepper1.stop();
     stepper2.stop();
@@ -211,6 +225,7 @@ long rpmToTickInterval(long targetRPM){
 
 void InitDriver1()
 {
+    Serial.println("InitDriver1");
     sd.setChipSelectPin(CSPin1);
 
     // Drive the STEP and DIR pins low initially.
@@ -221,24 +236,19 @@ void InitDriver1()
 
     // Give the driver some time to power up.
     delay(1);
-    Serial.println("DebugInitDriver1 : 1");
     // Reset the driver to its default settings and clear latched status
     // conditions.
     sd.resetSettings();
-    Serial.println("DebugInitDriver1 : 2");
     sd.clearStatus();
-    Serial.println("DebugInitDriver1 : 3");
 
     // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
     // for most applications, and we find that it usually works well.
     sd.setDecayMode(HPSDDecayMode::AutoMixed);
-    Serial.println("DebugInitDriver1 : 1");
     //sd.setDecayMode(HPSDDecayMode::Mixed);
     //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
     // Set the current limit. You should change the number here to an appropriate
     // value for your particular system.
     sd.setCurrentMilliamps36v4(MAXCURRENT);
-    Serial.println("DebugInitDriver1 : 1");
     // Set the number of microsteps that correspond to one full step.
     sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
     Serial.println("Début du test du driver 1");
@@ -259,6 +269,7 @@ void InitDriver1()
 }
 void InitDriver2()
 {
+    Serial.println("InitDriver2");
     sd.setChipSelectPin(CSPin2);
 
     // Drive the STEP and DIR pins low initially.

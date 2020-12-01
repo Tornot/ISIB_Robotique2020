@@ -38,10 +38,15 @@ public:
     bool isStepping();
     bool isStopped();
     bool isPaused();
-    static void ticking();
+    static void testISR();
+    static void ticking1();
+    static void ticking2();
+    static void ticking3();
+    static void ticking4();
     
 private:
     static SimpleStepper *firstInstance;
+    static SimpleStepper *secondInstance;
 };
 
 #endif // SIMPLE_STEPPER_BASE_H

@@ -30,20 +30,8 @@ ISR(Timer3_COMPA_vect)
   Timer3.isrCallback();
 }
 #elif defined(__AVR__)
-ISR(Timer3_OVF_vect)
+ISR(TIMER3_OVF_vect)
 {
-  Timer3.isrCallback();
-}
-
-#elif defined(__arm__) && defined(CORE_TEENSY)
-void ftm1_isr(void)
-{
-  uint32_t sc = FTM1_SC;
-  #ifdef KINETISL
-  if (sc & 0x80) FTM1_SC = sc;
-  #else
-  if (sc & 0x80) FTM1_SC = sc & 0x7F;
-  #endif
   Timer3.isrCallback();
 }
 

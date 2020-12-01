@@ -12,10 +12,23 @@
 #include "TimerThree.h"
 
 SimpleStepper *SimpleStepper::firstInstance;
+SimpleStepper *SimpleStepper::secondInstance;
 
 SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTimer){
-    if(!firstInstance){
-      firstInstance = this;
+    switch (stepperTimer)
+    {
+        case 1:
+            firstInstance = this;
+            break;
+        case 3:
+            secondInstance = this;
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
     }
     this->dirPin = Pin(dirpin);
     this->stepPin = Pin(steppin);
@@ -29,13 +42,21 @@ void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder à 
     switch (this->stepperTimer)
     {
         case 1:
+            Serial.print("firstInstance of stepper with stepperTimer : ");
+            Serial.print(this->stepperTimer);
+            Serial.println(" is : ");
+            //Serial.println(this->firstInstance);
             Timer1.initialize();
-            Timer1.attachInterrupt(SimpleStepper::ticking); 
+            Timer1.attachInterrupt(SimpleStepper::ticking1); 
             Timer1.stop();
             break;
         case 3:
+            Serial.print("secondInstance of stepper with stepperTimer : ");
+            Serial.print(this->stepperTimer);
+            Serial.println(" is : ");
+            //Serial.println(this->seconInstance);
             Timer3.initialize();
-            Timer3.attachInterrupt(SimpleStepper::ticking); 
+            Timer3.attachInterrupt(SimpleStepper::ticking2); 
             Timer3.stop();
             break;
         case 4:
@@ -197,7 +218,37 @@ bool SimpleStepper::isPaused(){
   return paused;
 }
 
-void SimpleStepper::ticking(){
+void SimpleStepper::testISR()
+{
+    uint8_t test =0;
+    test++;
+}
+
+void SimpleStepper::ticking1(){
+    if(firstInstance->ticksRemaining > 0){
+        //generate high/low signal for the stepper driver
+        firstInstance->stepPin.toggleState();
+        --firstInstance->ticksRemaining;
+    }
+}
+
+void SimpleStepper::ticking2(){
+    if(secondInstance->ticksRemaining > 0){
+        //generate high/low signal for the stepper driver
+        secondInstance->stepPin.toggleState();
+        --secondInstance->ticksRemaining;
+    }
+}
+
+void SimpleStepper::ticking3(){
+    if(firstInstance->ticksRemaining > 0){
+        //generate high/low signal for the stepper driver
+        firstInstance->stepPin.toggleState();
+        --firstInstance->ticksRemaining;
+    }
+}
+
+void SimpleStepper::ticking4(){
     if(firstInstance->ticksRemaining > 0){
         //generate high/low signal for the stepper driver
         firstInstance->stepPin.toggleState();

@@ -159,7 +159,6 @@ class TimerOne
     // properties
     static unsigned short pwmPeriod;
     static unsigned char clockSelectBits;
-
 };
 
 extern TimerOne Timer1;
