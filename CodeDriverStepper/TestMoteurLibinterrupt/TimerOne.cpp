@@ -34,7 +34,7 @@ ISR(TIMER1_OVF_vect)
 {
   Timer1.isrCallback();
 }
-
+/*
 #elif defined(__arm__) && defined(CORE_TEENSY)
 void ftm1_isr(void)
 {
@@ -46,7 +46,7 @@ void ftm1_isr(void)
   #endif
   Timer1.isrCallback();
 }
-
+*/
 #endif
 
 void TimerOne::isrDefaultUnused()

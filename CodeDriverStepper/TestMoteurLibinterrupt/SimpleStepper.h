@@ -23,9 +23,10 @@ protected:
     Pin dirPin = Pin(1000);
     Pin stepPin = dirPin;
     bool paused;
+    uint8_t stepperTimer;
     
 public:
-    SimpleStepper(uint8_t dirpin, uint8_t steppin);
+    SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTimer);
     void init();
     void setPulse(long pulse);
     bool step(long steps, uint8_t direction);
@@ -42,4 +43,5 @@ public:
 private:
     static SimpleStepper *firstInstance;
 };
+
 #endif // SIMPLE_STEPPER_BASE_H

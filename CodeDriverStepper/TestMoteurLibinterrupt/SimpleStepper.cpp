@@ -9,29 +9,62 @@
 
 #include "SimpleStepper.h"
 #include "TimerOne.h"
+#include "TimerThree.h"
 
 SimpleStepper *SimpleStepper::firstInstance;
 
-SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin){
+SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTimer){
     if(!firstInstance){
       firstInstance = this;
     }
-
     this->dirPin = Pin(dirpin);
     this->stepPin = Pin(steppin);
+    this->stepperTimer = stepperTimer;
 }
 
-void SimpleStepper::init(){
+void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder à celui que l'on veut. (du coup on évite le switch case) tabTimer[1].initalize()
     dirPin.setOutput();
     stepPin.setOutput();
-    Timer1.initialize();
-    Timer1.attachInterrupt(SimpleStepper::ticking); 
-    Timer1.stop();
+
+    switch (this->stepperTimer)
+    {
+        case 1:
+            Timer1.initialize();
+            Timer1.attachInterrupt(SimpleStepper::ticking); 
+            Timer1.stop();
+            break;
+        case 3:
+            Timer3.initialize();
+            Timer3.attachInterrupt(SimpleStepper::ticking); 
+            Timer3.stop();
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
+
     this->pause();
 }
 
 void SimpleStepper::setPulse(long pulse){
-    Timer1.setPeriod(pulse);
+    switch (this->stepperTimer)
+    {
+        case 1:
+            Timer1.setPeriod(pulse);
+            break;
+        case 3:
+            Timer3.setPeriod(pulse);
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
 }
 
 bool SimpleStepper::step(long steps, uint8_t direction){
@@ -69,8 +102,22 @@ long SimpleStepper::getRemainingSteps(){
 long SimpleStepper::stop(){
     //each step = 2 ticks
     long stepsRemaining = this->getRemainingSteps();
-
-    Timer1.stop();
+        switch (this->stepperTimer)
+    {
+        case 1:
+            Timer1.stop();
+            break;
+        case 3:
+            Timer3.stop();
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
+    
 
     if(ticksRemaining & 1){
         ticksRemaining = 1;
@@ -78,19 +125,62 @@ long SimpleStepper::stop(){
         ticksRemaining = 0;
     }
 
-    Timer1.start();
+     switch (this->stepperTimer)
+    {
+        case 1:
+            Timer1.start();
+            break;
+        case 3:
+            Timer3.start();
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
 
     return stepsRemaining;
 }
 
 void SimpleStepper::pause(){
   paused = true;
-  Timer1.stop();
+   switch (this->stepperTimer)
+    {
+        case 1:
+            Timer1.stop();
+            break;
+        case 3:
+            Timer3.stop();
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
+  
 }
 
 void SimpleStepper::resume(){
   if(paused){
-    Timer1.start();
+    switch (this->stepperTimer)
+    {
+        case 1:
+            Timer1.start();
+            break;
+        case 3:
+            Timer3.start();
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
     paused = false;
   }
 }

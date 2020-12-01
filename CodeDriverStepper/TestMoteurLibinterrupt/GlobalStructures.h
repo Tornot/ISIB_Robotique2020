@@ -16,6 +16,15 @@ typedef struct Steps_
     long StepMotor3;
     long StepMotor4;
 } Steps;
+/*
+typedef struct StructTimers_
+{
+    TimerOne Timer1;
+    TimerThree Timer3;
+    //TimerFour Timer4;
+    //TimerFive Timer5;
+}
+*/
 
 extern Coordinates nextCoordinates;
 extern Coordinates actualCoordinates; 
