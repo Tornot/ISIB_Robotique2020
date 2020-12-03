@@ -18,8 +18,8 @@
 #define MAXSPEED 10000          // Maximal speed in step/second !!!!NEED TO DO SOME CALCULATION TO DEFINE CORRECTLY
 #define MAXACCEL 100            // Maximal acceleration in step/s^2
 #define TIMETOREACH 5           //Time in ms to reach to target point
-#define MAXCURRENT 2800         //Max curent in one phase of motor
-
+#define MAXCURRENT 2800
+#define NBRSTEPSTODO 2000000
 
 
 /*
@@ -42,7 +42,7 @@ const uint8_t CSPin3 = 26;
 const uint8_t DirPin4 = 23;
 const uint8_t StepPin4 = 25;
 const uint8_t CSPin4 = 27;
-
+const uint8_t stopPin = 14;
 
 HighPowerStepperDriver sd;
 
@@ -71,9 +71,9 @@ long rpmToTickInterval(long targetRPM);
 
 void setup()
 {
-    //Serial.begin(9600);   //Doublon aec InitComm()
-    InitComm();
+    Serial.begin(9600);   //Doublon aec InitComm()
     SPI.begin();
+    
     InitDriver1();
     InitDriver2();
     InitDriver3();
@@ -83,55 +83,35 @@ void setup()
     stepper2.init();
     stepper3.init();
     stepper4.init();
-    FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates);
 
     Serial.println("Ready");
+
+    pinMode(14, INPUT);
+    while(digitalRead(stopPin) == LOW);
+
 }
 
-/*
 void loop()
 {
-  //DataReception (coordonnées, formattée de manière 'X', float, 'Y', float, 'Z', float)
-  DataReception();
-
-  //Compute speed and acceleration
-  //=> IN: coordinates, from a tab
-  AccelCompute(&coordinates);
-
-
-  //Modification of timer values => use a variable wich the timer will take at each tick
-  TimerModif();
-
-}
-*/
-
-void loop()
-{/* //Ici on a du code qui devrait pouvoir faire tourner les 4 moteurs à une vitesse fixe jusqu'à la position voulue
-    if (DataReception()) 
+    long nbrStepsDone = 0;
+    long nbrRemainingSteps = 0;
+    if(stepper4.isStopped())
     {
+        stepper4.step(NBRSTEPSTODO, CLOCKWISE, rpmToTickInterval(10));
+        stepper1.step(NBRSTEPSTODO, CLOCKWISE, rpmToTickInterval(10));
+    }
+    if (digitalRead(stopPin) == LOW)
+    {
+        stepper4.stop();
+        stepper1.stop();
+        nbrRemainingSteps = stepper4.getRemainingSteps();
+        nbrStepsDone = NBRSTEPSTODO - nbrRemainingSteps;
+        Serial.print("Nbr of steps done = ");
+        Serial.println(nbrStepsDone);
+        while(1);
+    }
 
-        FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates);
-        if (MotorStep.StepMotor1 > 0) 
-            stepper1.step(MotorStep.StepMotor1, CLOCKWISE, rpmToTickInterval(10));
-        else 
-            stepper1.step(-MotorStep.StepMotor1, ANTICW, rpmToTickInterval(10));
-        if (MotorStep.StepMotor2 > 0) 
-            stepper2.step(MotorStep.StepMotor2, CLOCKWISE, rpmToTickInterval(10));
-        else 
-            stepper2.step(-MotorStep.StepMotor2, ANTICW, rpmToTickInterval(10));
-        if (MotorStep.StepMotor3 > 0) 
-            stepper3.step(MotorStep.StepMotor3, CLOCKWISE, rpmToTickInterval(10));
-        else 
-            stepper3.step(-MotorStep.StepMotor3, ANTICW, rpmToTickInterval(10));
-        if (MotorStep.StepMotor4 > 0) 
-            stepper4.step(MotorStep.StepMotor4, CLOCKWISE, rpmToTickInterval(10));
-        else 
-            stepper4.step(-MotorStep.StepMotor4, ANTICW, rpmToTickInterval(10));
-
-        actualCoordinates = nextCoordinates; //On part du principe que lors de la prochaine réception, on a atteint le point voulu. 
-        //C'est pas très clean mais on fera aec pour l'instant.
-    }*/
-    TestTourner2Moteurs();
+    
 }
 
 //rpm to stepper tick in micro seconds
@@ -141,12 +121,6 @@ long rpmToTickInterval(long targetRPM){
     long pulseInMicroseconds = (long) (1000000L/stepsPerSecond) / 2;
 
     return pulseInMicroseconds;
-}
-
-long ValAbs(long x)
-{
-    if (x>=0) return x;
-    else return -x;
 }
 
 void InitDriver1()
@@ -343,8 +317,6 @@ void TestTourner2Moteurs()
     {
         case 0:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
-            stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
-            stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
         break;
         case 1:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
@@ -439,12 +411,14 @@ void TestTourner2Moteurs()
     //stop whatever the stepper is doing
     stepper1.stop();
     stepper2.stop();
-    stepper3.stop();
-    stepper4.stop();
     while(1);
   }
 }
 
-
+long ValAbs(long x)
+{
+    if (x>0) return x;
+    else return -x;
+}
 
 

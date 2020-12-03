@@ -15,12 +15,6 @@ void FonctionCoord2Steps(double a, double b, Coordinates InitCoord, Coordinates 
   double nextstepMot3 = sqrt(square(sqrt(square((a/2)+NextCoord.coordY)+square((b/2)+NextCoord.coordX)))+square(NextCoord.coordZ));
   double InitstepMot4 = sqrt(square(sqrt(square((a/2)+InitCoord.coordY)+square((b/2)-InitCoord.coordX)))+square(InitCoord.coordZ));
   double nextstepMot4 = sqrt(square(sqrt(square((a/2)+NextCoord.coordY)+square((b/2)-NextCoord.coordX)))+square(NextCoord.coordZ));
-
-    //TODO: 
-  //Transformer les m de nextstepMot1/2/3/4 en pas pour mettre dans MotorStep.StepMotor1  
-  //Pour cela, on a besoin de la correspondance mètre<=>pas
-
-
   MotorStep.StepMotor1 = (long)(InitstepMot1-nextstepMot1);
   MotorStep.StepMotor2 = (long)(InitstepMot2-nextstepMot2);
   MotorStep.StepMotor3 = (long)(InitstepMot3-nextstepMot3);
