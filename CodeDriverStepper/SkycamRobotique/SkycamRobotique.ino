@@ -106,12 +106,32 @@ void loop()
 */
 
 void loop()
-{/* //Ici on a du code qui devrait pouvoir faire tourner les 4 moteurs à une vitesse fixe jusqu'à la position voulue
+{ //Ici on a du code qui devrait pouvoir faire tourner les 4 moteurs à une vitesse fixe jusqu'à la position voulue
+
+    float v1=0;
+    float v2=0;
+    float v3=0;
+    float v4=0;
+    long delaiTimer1 = 0;
+    long delaiTimer2 = 0;
+    long delaiTimer3 = 0;
+    long delaiTimer4 = 0;
+
+
+
     if (DataReception()) 
     {
 
         FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates);
-        if (MotorStep.StepMotor1 > 0) 
+
+        //v1 = nbr pas à faire / deltaTemps (5ms)
+        //v1 = MotorStep.StepMotor1 / 0.005;
+        //Convertir la vitesse en délai pour timer
+        //delaiTimer1 =  (0.005/MotorStep.StepMotor1)/2; // On divise par 2 pcq on a 2 ticks par pas 
+        //stepper1.step(MotorStep.StepMotor1, CLOCKWISE, delaiTimer1);
+
+
+        if (MotorStep.StepMotor1 > 0)
             stepper1.step(MotorStep.StepMotor1, CLOCKWISE, rpmToTickInterval(10));
         else 
             stepper1.step(-MotorStep.StepMotor1, ANTICW, rpmToTickInterval(10));
@@ -130,7 +150,7 @@ void loop()
 
         actualCoordinates = nextCoordinates; //On part du principe que lors de la prochaine réception, on a atteint le point voulu. 
         //C'est pas très clean mais on fera aec pour l'instant.
-    }*/
+    }
     TestTourner2Moteurs();
 }
 
