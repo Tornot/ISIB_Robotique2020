@@ -1,5 +1,4 @@
 #include "AccelMoteur.h"
-#include "SkycamRobotique.ino"
 
 #define PERIOD_MIN 100             //Valeur arbitraire!! En us
 #define BREAK_THRESHOLD_DELTA_STEP 10     //Valeur arbitraire! A CHANGER!!!!!

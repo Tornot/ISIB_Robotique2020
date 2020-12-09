@@ -32,5 +32,6 @@ extern Coordinates tempCoordinates;
 
 extern Steps MotorStep;
 
+extern SimpleStepper stepperTab[4];
 #endif
 
