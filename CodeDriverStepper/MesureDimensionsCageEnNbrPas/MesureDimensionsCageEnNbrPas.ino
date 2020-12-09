@@ -16,7 +16,7 @@
 #define MAXACCEL 100            // Maximal acceleration in step/s^2
 #define TIMETOREACH 5           //Time in ms to reach to target point
 #define MAXCURRENT 2800
-#define NBRSTEPSTODO 2000000
+#define NBRSTEPSTODO 2000000    //2*10^6
 
 /*
 Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
@@ -28,6 +28,7 @@ https://www.forward.com.au/pfod/Robots/SpeedStepper/index.html
 const uint8_t DirPin1 = 2;
 const uint8_t StepPin1 = 3;
 const uint8_t CSPin1 = 4;
+const uint8_t stopPin = 14;
 
 HighPowerStepperDriver sd;
 
@@ -55,10 +56,10 @@ void setup()
     InitDriver1();
     stepper1.init();
 
-    FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates,MotorStep);
     Serial.println("Ready");
     pinMode(14, INPUT);
     while(digitalRead(stopPin) == LOW);
+    delay(2000);
 }
 
 
@@ -68,12 +69,16 @@ void loop()
     long nbrRemainingSteps = 0;
     if(stepper1.isStopped())
     {
-        stepper1.step(NBRSTEPSTODO, CLOCKWISE, rpmToTickInterval(10));
+        stepper1.step(NBRSTEPSTODO, ANTICW, rpmToTickInterval(10));
     }
     if (digitalRead(stopPin) == LOW)
     {
-        stepper1.stop();
-        nbrRemainingSteps = stepper1.getRemainingSteps();
+        nbrRemainingSteps = stepper1.stop();
+        Serial.print("Nbr of steps to do = ");
+        Serial.println(nbrRemainingSteps);
+        Serial.print("Nbr of remaining steps = ");
+        Serial.println(NBRSTEPSTODO);
+
         nbrStepsDone = NBRSTEPSTODO - nbrRemainingSteps;
         Serial.print("Nbr of steps done = ");
         Serial.println(nbrStepsDone);
@@ -93,6 +98,8 @@ long rpmToTickInterval(long targetRPM){
 
 void InitDriver1()
 {
+
+    Serial.println("InitDriver1");
     sd.setChipSelectPin(CSPin1);
 
     // Drive the STEP and DIR pins low initially.
@@ -103,24 +110,19 @@ void InitDriver1()
 
     // Give the driver some time to power up.
     delay(1);
-    Serial.println("DebugInitDriver1 : 1");
     // Reset the driver to its default settings and clear latched status
     // conditions.
     sd.resetSettings();
-    Serial.println("DebugInitDriver1 : 2");
     sd.clearStatus();
-    Serial.println("DebugInitDriver1 : 3");
 
     // Select auto mixed decay.  TI's DRV8711 documentation recommends this mode
     // for most applications, and we find that it usually works well.
     sd.setDecayMode(HPSDDecayMode::AutoMixed);
-    Serial.println("DebugInitDriver1 : 1");
     //sd.setDecayMode(HPSDDecayMode::Mixed);
     //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
     // Set the current limit. You should change the number here to an appropriate
     // value for your particular system.
     sd.setCurrentMilliamps36v4(MAXCURRENT);
-    Serial.println("DebugInitDriver1 : 1");
     // Set the number of microsteps that correspond to one full step.
     sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
     Serial.println("Début du test du driver 1");
