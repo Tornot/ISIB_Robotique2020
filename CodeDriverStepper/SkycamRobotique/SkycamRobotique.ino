@@ -52,6 +52,8 @@ SimpleStepper stepper3(DirPin3, StepPin3, 4);
 SimpleStepper stepper4(DirPin4, StepPin4, 5);
 uint8_t counter = 0;
 
+SimpleStepper stepperTab[4] = {stepper1, stepper2, stepper3, stepper4};
+
 Coordinates nextCoordinates = {0,0,0};
 Coordinates actualCoordinates = {0,0,0}; 
 Coordinates tempCoordinates = {0,0,0};

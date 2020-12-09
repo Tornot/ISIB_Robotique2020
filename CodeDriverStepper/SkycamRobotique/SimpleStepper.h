@@ -8,6 +8,7 @@
    */
 #ifndef SIMPLE_STEPPER_BASE_H
 #define SIMPLE_STEPPER_BASE_H
+
 #include <Arduino.h>
 #include "Pin.h"
 
@@ -17,6 +18,20 @@
 class SimpleStepper {
 public:
     volatile long ticksRemaining;   // remaining ticks, 2 ticks = 1 pulse = 1 microstep/step
+        
+    //Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuStep Cela nous fourni l'information de position
+    //Une variable pour la vitesse actuelle de chaque moteur stepper.actuPeriod
+    //Une variable pour la vitesse cible de chaque moteur stepper.tagetPeriod
+    //Une variable pour la prochaine vitesse de chaque moteur stepper.nextPeriod
+    //Une variable pour le delta période du timer de chaque moteur stepper.deltaPeriod
+    int actuStep;
+    _Bool actuDir;
+    int deltaStep;
+    int actuPeriod;
+    int targetPeriod;
+    int nextPeriod;
+    int deltaPeriod;
+    _Bool isRef;
 
 protected:
     /* for some stupid reason the Pin class requires initialization */ 
@@ -48,6 +63,7 @@ private:
     static SimpleStepper *secondInstance;
     static SimpleStepper *thirdInstance;
     static SimpleStepper *fourthInstance;
+    static int tickRefresh;
 };
 
 #endif // SIMPLE_STEPPER_BASE_H

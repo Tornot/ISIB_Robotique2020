@@ -155,7 +155,7 @@ long SimpleStepper::stop(){
             break;
     }
     
-
+    // if odd we do one last tick
     if(ticksRemaining & 1){
         ticksRemaining = 1;
     } else{
@@ -245,6 +245,8 @@ void SimpleStepper::ticking1(){
         firstInstance->stepPin.toggleState();
         --firstInstance->ticksRemaining;
     }
+    if (firstInstance->isRef)
+        tickRefresh--;
 }
 
 void SimpleStepper::ticking2(){
@@ -253,6 +255,8 @@ void SimpleStepper::ticking2(){
         secondInstance->stepPin.toggleState();
         --secondInstance->ticksRemaining;
     }
+    if (secondInstance->isRef)
+        tickRefresh--;
 }
 
 void SimpleStepper::ticking3(){
@@ -261,6 +265,8 @@ void SimpleStepper::ticking3(){
         thirdInstance->stepPin.toggleState();
         --thirdInstance->ticksRemaining;
     }
+    if (thirdInstance->isRef)
+        tickRefresh--;
 }
 
 void SimpleStepper::ticking4(){
@@ -269,4 +275,12 @@ void SimpleStepper::ticking4(){
         fourthInstance->stepPin.toggleState();
         --fourthInstance->ticksRemaining;
     }
+    if (fourthInstance->isRef)
+        tickRefresh--;
 }
+
+/*TODO
+- Implémenter la actuStep dans les callback + connaitre la direction (pour savoir si on incrémente ou décrémente)
+- Refaire les calculs tous les NBR_TICK_BETWEEN_COMPUTE
+- mettre la periode à la fin de AccelMoteur.cpp (appel fonction step())
+*/
