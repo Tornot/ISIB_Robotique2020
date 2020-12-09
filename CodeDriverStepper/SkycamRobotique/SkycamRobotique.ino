@@ -118,7 +118,7 @@ void loop()
     long delaiTimer4 = 0;
 
 
-
+/*
     if (DataReception()) 
     {
 
@@ -150,7 +150,9 @@ void loop()
 
         actualCoordinates = nextCoordinates; //On part du principe que lors de la prochaine réception, on a atteint le point voulu. 
         //C'est pas très clean mais on fera aec pour l'instant.
-    }
+    }*/
+
+
     TestTourner2Moteurs();
 }
 
@@ -354,6 +356,10 @@ void InitDriver4()
     }
 }
 
+
+
+
+
 void TestTourner2Moteurs()
 {
         //once the stepper finished stepping to remaining ticks/steps
@@ -363,8 +369,8 @@ void TestTourner2Moteurs()
     {
         case 0:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
-            stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
-            stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
+            //stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
+            //stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
         break;
         case 1:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
