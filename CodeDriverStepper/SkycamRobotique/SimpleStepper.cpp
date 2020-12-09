@@ -17,6 +17,7 @@ SimpleStepper *SimpleStepper::firstInstance;
 SimpleStepper *SimpleStepper::secondInstance;
 SimpleStepper *SimpleStepper::thirdInstance;
 SimpleStepper *SimpleStepper::fourthInstance;
+int SimpleStepper::tickRefresh;
 
 SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTimer){
     switch (stepperTimer)

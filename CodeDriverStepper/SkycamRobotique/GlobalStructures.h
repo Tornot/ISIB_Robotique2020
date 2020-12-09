@@ -1,6 +1,7 @@
 
 #ifndef GLOBAL_STRUCTURES
 #define GLOBAL_STRUCTURES
+#include "SimpleStepper.h"
 
 typedef struct Coordinates_//coordonees en float //next est la coord que l'on veut atteindre // actual est la coord actuelle, à l'instant où on fait les calculs
 {
@@ -34,4 +35,3 @@ extern Steps MotorStep;
 
 extern SimpleStepper stepperTab[4];
 #endif
-
