@@ -369,8 +369,8 @@ void TestTourner2Moteurs()
     {
         case 0:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
-            //stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
-            //stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
+            stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
+            stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
         break;
         case 1:
             stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));

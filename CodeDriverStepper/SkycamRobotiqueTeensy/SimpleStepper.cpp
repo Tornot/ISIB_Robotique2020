@@ -248,8 +248,6 @@ void SimpleStepper::ticking1(){
         firstInstance->stepPin.toggleState();
         --firstInstance->ticksRemaining;
     }
-    if (this->isRef)
-        NBR_TICK_BETWEEN_COMPUTE
 }
 
 void SimpleStepper::ticking2(){
