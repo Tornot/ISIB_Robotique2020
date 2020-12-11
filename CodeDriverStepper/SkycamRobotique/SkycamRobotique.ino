@@ -1,7 +1,7 @@
 
 
 
-#include "GlobalStructures.h"
+#include "Global.h"
 #include <SPI.h>
 #include <HighPowerStepperDriver.h>
 #include "SimpleStepper.h"
@@ -11,16 +11,6 @@
 #include "TimerThree.h"
 #include "TimerFour.h"
 #include "TimerFive.h"
-
-#define MOTORSTEPS 51200        // 360/1.8 = 200 full steps * 256 microsteps = number of steps per revolution 
-#define CLOCKWISE 1             // Rotation of the stepper motor, reverse if it is swapped
-#define ANTICW 0                // Rotation of the stepper motor, reverse if it is swapped
-#define MAXSPEED 10000          // Maximal speed in step/second !!!!NEED TO DO SOME CALCULATION TO DEFINE CORRECTLY
-#define MAXACCEL 100            // Maximal acceleration in step/s^2
-#define TIMETOREACH 5           //Time in ms to reach to target point
-#define MAXCURRENT 2800         //Max curent in one phase of motor
-
-
 
 /*
 Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
@@ -58,9 +48,9 @@ Coordinates nextCoordinates = {0,0,0};
 Coordinates actualCoordinates = {0,0,0}; 
 Coordinates tempCoordinates = {0,0,0};
 
-Steps MotorStep = {0,0,0,0};
-double A = 300;//j'ai mis 30 oklm en attendant
-double B = 100;//j'ai mis 10 oklm en attendant
+//Steps MotorStep = {0,0,0,0}; //No more in use, need to clean it with the declaration of the structure
+double A = 773000;//Structure fait ~1m*1m*1m à raison de 773pas/mm avec 256µstep/step
+double B = 773000;
 
 void InitDriver1();
 void InitDriver2();
@@ -198,7 +188,7 @@ void InitDriver1()
     //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
     // Set the current limit. You should change the number here to an appropriate
     // value for your particular system.
-    sd.setCurrentMilliamps36v4(MAXCURRENT);
+    sd.setCurrentMilliamps36v4(MAX_CURRENT);
     // Set the number of microsteps that correspond to one full step.
     sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
     Serial.println("Début du test du driver 1");
@@ -243,7 +233,7 @@ void InitDriver2()
     //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
     // Set the current limit. You should change the number here to an appropriate
     // value for your particular system.
-    sd.setCurrentMilliamps36v4(MAXCURRENT);
+    sd.setCurrentMilliamps36v4(MAX_CURRENT);
 
     // Set the number of microsteps that correspond to one full step.
     sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
@@ -290,7 +280,7 @@ void InitDriver3()
     //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
     // Set the current limit. You should change the number here to an appropriate
     // value for your particular system.
-    sd.setCurrentMilliamps36v4(MAXCURRENT);
+    sd.setCurrentMilliamps36v4(MAX_CURRENT);
 
     // Set the number of microsteps that correspond to one full step.
     sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
@@ -337,7 +327,7 @@ void InitDriver4()
     //sd.setDecayMode(HPSDDecayMode::Slow);//Cause heavy vibrations
     // Set the current limit. You should change the number here to an appropriate
     // value for your particular system.
-    sd.setCurrentMilliamps36v4(MAXCURRENT);
+    sd.setCurrentMilliamps36v4(MAX_CURRENT);
 
     // Set the number of microsteps that correspond to one full step.
     sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max

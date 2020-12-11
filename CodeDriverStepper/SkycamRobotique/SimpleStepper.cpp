@@ -8,11 +8,8 @@
    */
 
 #include "SimpleStepper.h"
-#include "TimerOne.h"
-#include "TimerThree.h"
-#include "TimerFour.h"
-#include "TimerFive.h"
 
+//Définition des variables statiques
 SimpleStepper *SimpleStepper::firstInstance;
 SimpleStepper *SimpleStepper::secondInstance;
 SimpleStepper *SimpleStepper::thirdInstance;
@@ -40,6 +37,7 @@ SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTim
     this->dirPin = Pin(dirpin);
     this->stepPin = Pin(steppin);
     this->stepperTimer = stepperTimer;
+    this->isRef = 0; 
 }
 
 void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder à celui que l'on veut. (du coup on évite le switch case) tabTimer[1].initalize()
@@ -79,7 +77,6 @@ void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder à 
         default:
             break;
     }
-
     this->pause();
 }
 
@@ -110,12 +107,16 @@ bool SimpleStepper::step(long steps, uint8_t direction){
 
     this->ticksRemaining = steps * 2; //converting steps to ticks
     
-    if(direction == HIGH){
+    if(direction == HIGH)
+    {
       this->dirPin.setHigh();
-    } else {
+    } 
+    else 
+    {
        this->dirPin.setLow();
+       
     }
-
+    this->actuDir = direction;
     return true;
 }
 
@@ -240,12 +241,22 @@ bool SimpleStepper::isPaused(){
   return paused;
 }
 
+int SimpleStepper::getTickRefresh()
+{
+    return tickRefresh;
+}
+
 void SimpleStepper::ticking1(){
     if(firstInstance->ticksRemaining > 0){
         //generate high/low signal for the stepper driver
         firstInstance->stepPin.toggleState();
         --firstInstance->ticksRemaining;
     }
+    if ((firstInstance->actuDir == CLOCKWISE) && (firstInstance->ticksRemaining & 1))
+        firstInstance->actuSteps++;
+    else if ((firstInstance->actuDir == ANTICW) && (firstInstance->ticksRemaining & 1))
+        firstInstance->actuSteps--;
+
     if (firstInstance->isRef)
         tickRefresh--;
 }
@@ -256,6 +267,11 @@ void SimpleStepper::ticking2(){
         secondInstance->stepPin.toggleState();
         --secondInstance->ticksRemaining;
     }
+    if ((secondInstance->actuDir == CLOCKWISE) && (secondInstance->ticksRemaining & 1))
+        secondInstance->actuSteps++;
+    else if ((secondInstance->actuDir == ANTICW) && (secondInstance->ticksRemaining & 1))
+        secondInstance->actuSteps--;
+
     if (secondInstance->isRef)
         tickRefresh--;
 }
@@ -266,6 +282,11 @@ void SimpleStepper::ticking3(){
         thirdInstance->stepPin.toggleState();
         --thirdInstance->ticksRemaining;
     }
+    if ((thirdInstance->actuDir == CLOCKWISE) && (thirdInstance->ticksRemaining & 1))
+        thirdInstance->actuSteps++;
+    else if ((thirdInstance->actuDir == ANTICW) && (thirdInstance->ticksRemaining & 1))
+        thirdInstance->actuSteps--;
+
     if (thirdInstance->isRef)
         tickRefresh--;
 }
@@ -276,12 +297,20 @@ void SimpleStepper::ticking4(){
         fourthInstance->stepPin.toggleState();
         --fourthInstance->ticksRemaining;
     }
+    if ((fourthInstance->actuDir == CLOCKWISE) && (fourthInstance->ticksRemaining & 1))
+        fourthInstance->actuSteps++;
+    else if ((fourthInstance->actuDir == ANTICW) && (fourthInstance->ticksRemaining & 1))
+        fourthInstance->actuSteps--;
+
     if (fourthInstance->isRef)
         tickRefresh--;
 }
 
 /*TODO
-- Implémenter la actuStep dans les callback + connaitre la direction (pour savoir si on incrémente ou décrémente)
+- Implémenter la actuSteps dans les callback + connaitre la direction (pour savoir si on incrémente ou décrémente)
 - Refaire les calculs tous les NBR_TICK_BETWEEN_COMPUTE
 - mettre la periode à la fin de AccelMoteur.cpp (appel fonction step())
+- Problème de signe à régler
+-!!! On va avoir un pb quand on change de direction, car il faut absolument finir le pas en cours avant (ou pas, vu qu'on ne fait pas de toogle, 
+    on serait amené à mettre la broche à 1 alors qu'elle l'est déjà, ça pourrait peut-être compenser). En gros, c'est à vérifier!!
 */

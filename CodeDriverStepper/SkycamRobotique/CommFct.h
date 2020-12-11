@@ -4,7 +4,7 @@
 #define COMM_FCT
 
 #include <SPI.h>
-#include "GlobalStructures.h"
+#include "Global.h"
 
 #define TIMEOUTTIME 50
 

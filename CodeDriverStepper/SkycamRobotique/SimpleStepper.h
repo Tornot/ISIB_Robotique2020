@@ -11,6 +11,12 @@
 
 #include <Arduino.h>
 #include "Pin.h"
+#include "Global.h"
+#include "TimerOne.h"
+#include "TimerThree.h"
+#include "TimerFour.h"
+#include "TimerFive.h"
+
 
 /*
  * Simple Stepper class.
@@ -19,18 +25,19 @@ class SimpleStepper {
 public:
     volatile long ticksRemaining;   // remaining ticks, 2 ticks = 1 pulse = 1 microstep/step
         
-    //Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuStep Cela nous fourni l'information de position
+    //Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuSteps Cela nous fourni l'information de position
     //Une variable pour la vitesse actuelle de chaque moteur stepper.actuPeriod
     //Une variable pour la vitesse cible de chaque moteur stepper.tagetPeriod
     //Une variable pour la prochaine vitesse de chaque moteur stepper.nextPeriod
     //Une variable pour le delta période du timer de chaque moteur stepper.deltaPeriod
-    int actuStep;
-    _Bool actuDir;
-    int deltaStep;
-    int actuPeriod;
-    int targetPeriod;
-    int nextPeriod;
-    int deltaPeriod;
+    long actuSteps;
+    long deltaStep;
+    _Bool actuDir;  //0 = ANTICW, 1 = CLOCKWISE
+    long c;  //C'est toi Geoffrey qui a mit ça? Ça sert à quoi???
+    long actuPeriod;
+    long targetPeriod;
+    long nextPeriod;
+    long deltaPeriod;
     _Bool isRef;
 
 protected:
@@ -53,6 +60,7 @@ public:
     bool isStepping();
     bool isStopped();
     bool isPaused();
+    int getTickRefresh();
     static void ticking1();
     static void ticking2();
     static void ticking3();
@@ -63,7 +71,7 @@ private:
     static SimpleStepper *secondInstance;
     static SimpleStepper *thirdInstance;
     static SimpleStepper *fourthInstance;
-    static int tickRefresh;
+    static int tickRefresh;//Number of ticks remaining before compute a new speed
 };
 
 #endif // SIMPLE_STEPPER_BASE_H

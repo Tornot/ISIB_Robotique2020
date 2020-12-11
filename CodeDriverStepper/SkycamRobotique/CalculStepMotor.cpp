@@ -1,29 +1,42 @@
 //############################################## CODE POUR CALCULER LE NOMBRE DE STEP POUR ATTEINDRE NEXT COORDINATES #######################################################################
 #include "CalculStepMotor.h"
-//A FAIRE AU LABO : mesurer les distances A et B (en nombre de step)
 
 //Fonction qui mets à jour les structures de Coordonnées
 
-//Fonction qui traduit les coordonnées en nombre de step -> doit renvoyer 4 long (dans une struct)
-void FonctionCoord2Steps(double a, double b, Coordinates InitCoord, Coordinates NextCoord){
-  
-  double InitstepMot1 = sqrt(square(sqrt(square((a/2)-InitCoord.coordY)+square((b/2)+InitCoord.coordX)))+square(InitCoord.coordZ));
-  double nextstepMot1 = sqrt(square(sqrt(square((a/2)-NextCoord.coordY)+square((b/2)+NextCoord.coordX)))+square(NextCoord.coordZ));
-  double InitstepMot2 = sqrt(square(sqrt(square((a/2)-InitCoord.coordY)+square((b/2)-InitCoord.coordX)))+square(InitCoord.coordZ));
-  double nextstepMot2 = sqrt(square(sqrt(square((a/2)-NextCoord.coordY)+square((b/2)-NextCoord.coordX)))+square(NextCoord.coordZ));
-  double InitstepMot3 = sqrt(square(sqrt(square((a/2)+InitCoord.coordY)+square((b/2)+InitCoord.coordX)))+square(InitCoord.coordZ));
-  double nextstepMot3 = sqrt(square(sqrt(square((a/2)+NextCoord.coordY)+square((b/2)+NextCoord.coordX)))+square(NextCoord.coordZ));
-  double InitstepMot4 = sqrt(square(sqrt(square((a/2)+InitCoord.coordY)+square((b/2)-InitCoord.coordX)))+square(InitCoord.coordZ));
-  double nextstepMot4 = sqrt(square(sqrt(square((a/2)+NextCoord.coordY)+square((b/2)-NextCoord.coordX)))+square(NextCoord.coordZ));
+//Fonction qui traduit les coordonnées (en mètres) en nombre de step à parcourir pour chaque moteur. Ce nombre de pas est signé!
+void FonctionCoord2Steps(double a, double b, Coordinates InitCoord, Coordinates NextCoord)
+{
+  double InitstepMot1 = sqrt(square((a/2)-InitCoord.coordY)+square((b/2)+InitCoord.coordX)+square(InitCoord.coordZ));
+  double nextstepMot1 = sqrt(square((a/2)-NextCoord.coordY)+square((b/2)+NextCoord.coordX)+square(NextCoord.coordZ));
+  double InitstepMot2 = sqrt(square((a/2)-InitCoord.coordY)+square((b/2)-InitCoord.coordX)+square(InitCoord.coordZ));
+  double nextstepMot2 = sqrt(square((a/2)-NextCoord.coordY)+square((b/2)-NextCoord.coordX)+square(NextCoord.coordZ));
+  double InitstepMot3 = sqrt(square((a/2)+InitCoord.coordY)+square((b/2)+InitCoord.coordX)+square(InitCoord.coordZ));
+  double nextstepMot3 = sqrt(square((a/2)+NextCoord.coordY)+square((b/2)+NextCoord.coordX)+square(NextCoord.coordZ));
+  double InitstepMot4 = sqrt(square((a/2)+InitCoord.coordY)+square((b/2)-InitCoord.coordX)+square(InitCoord.coordZ));
+  double nextstepMot4 = sqrt(square((a/2)+NextCoord.coordY)+square((b/2)-NextCoord.coordX)+square(NextCoord.coordZ));
 
-    //TODO: 
-  //Transformer les m de nextstepMot1/2/3/4 en pas pour mettre dans MotorStep.StepMotor1  
-  //Pour cela, on a besoin de la correspondance mètre<=>pas
+  InitstepMot1 *= RATIO_STEP_PER_METER;
+  nextstepMot1 *= RATIO_STEP_PER_METER;
+  InitstepMot2 *= RATIO_STEP_PER_METER;
+  nextstepMot2 *= RATIO_STEP_PER_METER;
+  InitstepMot3 *= RATIO_STEP_PER_METER;
+  nextstepMot3 *= RATIO_STEP_PER_METER;
+  InitstepMot4 *= RATIO_STEP_PER_METER;
+  nextstepMot4 *= RATIO_STEP_PER_METER;
 
-
-  MotorStep.StepMotor1 = (long)(InitstepMot1-nextstepMot1);
-  MotorStep.StepMotor2 = (long)(InitstepMot2-nextstepMot2);
-  MotorStep.StepMotor3 = (long)(InitstepMot3-nextstepMot3);
-  MotorStep.StepMotor4 = (long)(InitstepMot4-nextstepMot4);
-  
+  stepperTab[0].deltaStep = (long)(InitstepMot1-nextstepMot1);
+  stepperTab[1].deltaStep = (long)(InitstepMot2-nextstepMot2);
+  stepperTab[2].deltaStep = (long)(InitstepMot3-nextstepMot3);
+  stepperTab[3].deltaStep = (long)(InitstepMot4-nextstepMot4);
 };
+
+
+
+//Fonction qui calcule les coord grâce à L2 et L4
+void UpdateActualCoord(long L2, long L4){
+   float alpha = acos((L2*L2+A*A-L4*L4)/2*L2*A);
+   float x2 = L2*sin(alpha);
+   float y2 = L2*cos(alpha);
+   actualCoordinates.coordX = (B/2) - x2;
+   actualCoordinates.coordY = (A/2) - y2;
+}
