@@ -6,14 +6,14 @@
 //Fonction qui traduit les coordonnées (en mètres) en nombre de step à parcourir pour chaque moteur. Ce nombre de pas est signé!
 void FonctionCoord2Steps(double a, double b, Coordinates InitCoord, Coordinates NextCoord)
 {
-  double InitstepMot1 = sqrt(square((a/2)-InitCoord.coordY)+square((b/2)+InitCoord.coordX)+square(InitCoord.coordZ));
-  double nextstepMot1 = sqrt(square((a/2)-NextCoord.coordY)+square((b/2)+NextCoord.coordX)+square(NextCoord.coordZ));
-  double InitstepMot2 = sqrt(square((a/2)-InitCoord.coordY)+square((b/2)-InitCoord.coordX)+square(InitCoord.coordZ));
-  double nextstepMot2 = sqrt(square((a/2)-NextCoord.coordY)+square((b/2)-NextCoord.coordX)+square(NextCoord.coordZ));
-  double InitstepMot3 = sqrt(square((a/2)+InitCoord.coordY)+square((b/2)+InitCoord.coordX)+square(InitCoord.coordZ));
-  double nextstepMot3 = sqrt(square((a/2)+NextCoord.coordY)+square((b/2)+NextCoord.coordX)+square(NextCoord.coordZ));
-  double InitstepMot4 = sqrt(square((a/2)+InitCoord.coordY)+square((b/2)-InitCoord.coordX)+square(InitCoord.coordZ));
-  double nextstepMot4 = sqrt(square((a/2)+NextCoord.coordY)+square((b/2)-NextCoord.coordX)+square(NextCoord.coordZ));
+  double InitstepMot1 = sqrt((((a/2)-InitCoord.coordY)*((a/2)-InitCoord.coordY))+(((b/2)+InitCoord.coordX)*((b/2)+InitCoord.coordX))+((InitCoord.coordZ)*(InitCoord.coordZ)));
+  double nextstepMot1 = sqrt((((a/2)-NextCoord.coordY)*((a/2)-NextCoord.coordY))+(((b/2)+NextCoord.coordX)*((b/2)+NextCoord.coordX))+((NextCoord.coordZ)*(NextCoord.coordZ)));
+  double InitstepMot2 = sqrt((((a/2)-InitCoord.coordY)*((a/2)-InitCoord.coordY))+(((b/2)-InitCoord.coordX)*((b/2)-InitCoord.coordX))+((InitCoord.coordZ)*(InitCoord.coordZ)));
+  double nextstepMot2 = sqrt((((a/2)-NextCoord.coordY)*((a/2)-NextCoord.coordY))+(((b/2)-NextCoord.coordX)*((b/2)-NextCoord.coordX))+((NextCoord.coordZ)*(NextCoord.coordZ)));
+  double InitstepMot3 = sqrt((((a/2)+InitCoord.coordY)*((a/2)+InitCoord.coordY))+(((b/2)+InitCoord.coordX)*((b/2)+InitCoord.coordX))+((InitCoord.coordZ)*(InitCoord.coordZ)));
+  double nextstepMot3 = sqrt((((a/2)+NextCoord.coordY)*((a/2)+NextCoord.coordY))+(((b/2)+NextCoord.coordX)*((b/2)+NextCoord.coordX))+((NextCoord.coordZ)*(NextCoord.coordZ)));
+  double InitstepMot4 = sqrt((((a/2)+InitCoord.coordY)*((a/2)+InitCoord.coordY))+(((b/2)-InitCoord.coordX)*((b/2)-InitCoord.coordX))+((InitCoord.coordZ)*(InitCoord.coordZ)));
+  double nextstepMot4 = sqrt((((a/2)+NextCoord.coordY)*((a/2)+NextCoord.coordY))+(((b/2)-NextCoord.coordX)*((b/2)-NextCoord.coordX))+((NextCoord.coordZ)*(NextCoord.coordZ)));
 
   InitstepMot1 *= RATIO_STEP_PER_METER;
   nextstepMot1 *= RATIO_STEP_PER_METER;
@@ -33,10 +33,9 @@ void FonctionCoord2Steps(double a, double b, Coordinates InitCoord, Coordinates 
 
 
 //Fonction qui calcule les coord grâce à L2 et L4
-void UpdateActualCoord(long L2, long L4){
-   float alpha = acos((L2*L2+A*A-L4*L4)/2*L2*A);
-   float x2 = L2*sin(alpha);
-   float y2 = L2*cos(alpha);
-   actualCoordinates.coordX = (B/2) - x2;
-   actualCoordinates.coordY = (A/2) - y2;
+void UpdateActualCoord(long L1, long L2, long L3){
+  actualCoordinates.coordX = ((L1*L1)-(L2*L2))/(2*B);
+  actualCoordinates.coordY = ((L3*L3)-(L1*L1))/(2*A);
+  actualCoordinates.coordZ = sqrt((L1*L1)-(((A/2)-actualCoordinates.coordY)*((A/2)-actualCoordinates.coordY))-(((B/2)+actualCoordinates.coordY)*((B/2)-actualCoordinates.coordY)));
+
 }

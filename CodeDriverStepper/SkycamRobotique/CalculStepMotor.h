@@ -15,6 +15,6 @@ extern SimpleStepper stepperTab[];
 
 //Fonction qui traduit les coordonnées en nombre de step -> doit renvoyer 4 long (dans une struct)
 void FonctionCoord2Steps(double a, double b, Coordinates InitCoord, Coordinates NextCoord);
-void UpdateActualCoord(long L2, long L4);
+void UpdateActualCoord(long L1, long L2, long L3);
 #endif
 

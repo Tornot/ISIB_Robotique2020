@@ -24,7 +24,7 @@
 class SimpleStepper {
 public:
     volatile long ticksRemaining;   // remaining ticks, 2 ticks = 1 pulse = 1 microstep/step
-        
+    static int tickRefresh;//Number of ticks remaining before compute a new speed
     //Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuSteps Cela nous fourni l'information de position
     //Une variable pour la vitesse actuelle de chaque moteur stepper.actuPeriod
     //Une variable pour la vitesse cible de chaque moteur stepper.tagetPeriod
@@ -33,7 +33,6 @@ public:
     long actuSteps;
     long deltaStep;
     _Bool actuDir;  //0 = ANTICW, 1 = CLOCKWISE
-    long c;  //C'est toi Geoffrey qui a mit ça? Ça sert à quoi???
     long actuPeriod;
     long targetPeriod;
     long nextPeriod;
@@ -71,7 +70,7 @@ private:
     static SimpleStepper *secondInstance;
     static SimpleStepper *thirdInstance;
     static SimpleStepper *fourthInstance;
-    static int tickRefresh;//Number of ticks remaining before compute a new speed
+    
 };
 
 #endif // SIMPLE_STEPPER_BASE_H

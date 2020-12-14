@@ -28,7 +28,7 @@ void AccelCompute(uint8_t timeToReach)
     //TODO: Mettre à jour les coord actuelles en mètres avant d'appeler FonctionCoord2Steps()
     /////////////////////
     /////////On update que les coord en X et en Y!!! On va avoir des erreurs!!!!!!!!!
-    UpdateActualCoord(stepperTab[1].actuSteps,stepperTab[3].actuSteps);
+    UpdateActualCoord(stepperTab[0].actuSteps,stepperTab[1].actuSteps,stepperTab[2].actuSteps);
     Serial.println("On a un while(1) après, il faut le virer quand on a corrigé. Se trouve dans AccelMoteur.cpp");
     while(1);//Tant qu'on n'a pas corrigé l'erreur d'avant, on ne fait rien!!
     //Calculer le deltaStep pour chaque moteur

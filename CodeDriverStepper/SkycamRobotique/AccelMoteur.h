@@ -7,8 +7,8 @@
 
 
 // Variables
-int deltaStepMaxIndex;
-int deltaPeriodMaxIndex;
+extern int deltaStepMaxIndex;
+extern int deltaPeriodMaxIndex;
 
 
 extern Steps MotorStep;

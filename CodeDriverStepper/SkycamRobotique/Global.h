@@ -8,7 +8,7 @@
 #define ANTICW 0                // Rotation of the stepper motor, reverse if it is swapped
 #define MAX_SPEED 10000          // Maximal speed in step/second !!!!NEED TO DO SOME CALCULATION TO DEFINE CORRECTLY
 #define MAX_ACCEL 100            // Maximal acceleration in step/s^2
-#define TIME_TO_REACH 5           //Time in ms to reach to target point
+#define TIME_TO_REACH 10           //Time in ms to reach to target point
 #define MAX_CURRENT 2800         //Max curent in one phase of motor
 #define RATIO_STEP_PER_METER 773000
 
