@@ -1,6 +1,9 @@
 
 
-
+/*
+Je pense savoir ce qui ne va pas. Quand on calcule le nombre de steps à faire, on modifie deltaSteps, mais cette variable DOIT être actualisée aant chaque calcul.
+Par contre, on pourrait actualiser simplement en faisant une soustraction de actusteps et de target steps (variable à implémenter)
+*/
 #include "Global.h"
 #include <SPI.h>
 #include <HighPowerStepperDriver.h>
@@ -59,11 +62,14 @@ SimpleStepper stepper3(DirPin3, StepPin3, 4);
 SimpleStepper stepper4(DirPin4, StepPin4, 5);
 uint8_t counter = 0;
 
-SimpleStepper stepperTab[4] = {stepper1, stepper2, stepper3, stepper4};
+//SimpleStepper* stepperTab[4] = {stepper1, stepper2, stepper3, stepper4};
+SimpleStepper* stepperTab[4] = {&stepper1, &stepper2, &stepper3, &stepper4};
 
-Coordinates nextCoordinates = {0,0,0};
-Coordinates actualCoordinates = {0,0,0}; 
-Coordinates tempCoordinates = {0,0,0};
+Coordinates nextCoordinates =   {0.0,0.0,0.7};
+Coordinates actualCoordinates = {0.0,0.0,0.7}; 
+Coordinates tempCoordinates =   {0.0,0.0,0.7};
+Coordinates initCoordinates =   {0.0,0.0,0.7};
+Steps TargetMotorStep = {0,0,0,0};
 
 //Steps MotorStep = {0,0,0,0}; //No more in use, need to clean it with the declaration of the structure
 //double A = 773000.0;//Structure fait ~1m*1m*1m à raison de 773pas/mm avec 256µstep/step
@@ -82,6 +88,7 @@ void InitDriver4();
 void TestTourner4Moteurs();
 void TestDeplacementAvecCst();
 void TestDeplacementAvecAccel();
+void TestDeplacementUnity();
 long ValAbs(long x);
 long rpmToTickInterval(long targetRPM);
 
@@ -99,8 +106,7 @@ void setup()
     stepper2.init();
     stepper3.init();
     stepper4.init();
-    FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates);
-
+    SetOrigin(A,B,initCoordinates);
     Serial.println("Ready");
 }
 
@@ -124,8 +130,9 @@ void loop()
 void loop()
 {
     //TestTourner4Moteurs();
-    TestDeplacementAvecCst();
-    //TestDeplacementAvecAccel();
+    //TestDeplacementAvecCst();
+    TestDeplacementAvecAccel();
+    //TestDeplacementUnity();
 }
 
 //rpm to stepper tick in micro seconds
@@ -146,6 +153,7 @@ long ValAbs(long x)
 void InitDriver1()
 {
     bool initOK = 0;
+    //initOK = 1;
     while (!initOK)
     {
         Serial.println("InitDriver1");
@@ -173,7 +181,7 @@ void InitDriver1()
         // value for your particular system.
         sd.setCurrentMilliamps36v4(MAX_CURRENT);
         // Set the number of microsteps that correspond to one full step.
-        sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
+        sd.setStepMode(HPSDStepMode::MicroStep8);//A definir en fct de Vitesse_max
         Serial.println("Début du test du driver 1");
         if (sd.verifySettings())
         {
@@ -196,6 +204,7 @@ void InitDriver1()
 void InitDriver2()
 {
     bool initOK = 0;
+    //initOK = 1;
     while (!initOK)
     {
         Serial.println("InitDriver2");
@@ -225,7 +234,7 @@ void InitDriver2()
         sd.setCurrentMilliamps36v4(MAX_CURRENT);
 
         // Set the number of microsteps that correspond to one full step.
-        sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
+        sd.setStepMode(HPSDStepMode::MicroStep8);//A definir en fct de Vitesse_max
         Serial.println("Début du test du driver 2");
         if (sd.verifySettings())
         {
@@ -249,6 +258,7 @@ void InitDriver2()
 void InitDriver3()
 {
     bool initOK = 0;
+    //initOK = 1;
     while (!initOK)
     {
         Serial.println("InitDriver3");
@@ -278,7 +288,7 @@ void InitDriver3()
         sd.setCurrentMilliamps36v4(MAX_CURRENT);
 
         // Set the number of microsteps that correspond to one full step.
-        sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
+        sd.setStepMode(HPSDStepMode::MicroStep8);//A definir en fct de Vitesse_max
         Serial.println("Début du test du driver 3");
         if (sd.verifySettings())
         {
@@ -302,6 +312,7 @@ void InitDriver3()
 void InitDriver4()
 {
     bool initOK = 0;
+    //initOK = 1;
     while (!initOK)
     {
         Serial.println("InitDriver4");
@@ -331,7 +342,7 @@ void InitDriver4()
         sd.setCurrentMilliamps36v4(MAX_CURRENT);
 
         // Set the number of microsteps that correspond to one full step.
-        sd.setStepMode(HPSDStepMode::MicroStep256);//A definir en fct de Vitesse_max
+        sd.setStepMode(HPSDStepMode::MicroStep8);//A definir en fct de Vitesse_max
         Serial.println("Début du test du driver 4");
         if (sd.verifySettings())
         {
@@ -471,14 +482,6 @@ void TestDeplacementAvecCst()
 {
  //Ici on a du code qui devrait pouvoir faire tourner les 4 moteurs à une vitesse fixe jusqu'à la position voulue
 
-    float v1=0;
-    float v2=0;
-    float v3=0;
-    float v4=0;
-    long delaiTimer1 = 0;
-    long delaiTimer2 = 0;
-    long delaiTimer3 = 0;
-    long delaiTimer4 = 0;
     actualCoordinates.coordX = 0.0;
     actualCoordinates.coordY = 0.0; 
     actualCoordinates.coordZ = 0.7;
@@ -490,7 +493,7 @@ void TestDeplacementAvecCst()
         {
             nextCoordinates.coordX = 0.25;
             nextCoordinates.coordY = 0.25;
-            nextCoordinates.coordZ = 0.2;
+            nextCoordinates.coordZ = 0.5;
             FonctionCoord2Steps(A,B,actualCoordinates,nextCoordinates);
 
             //v1 = nbr pas à faire / deltaTemps (5ms)
@@ -500,30 +503,40 @@ void TestDeplacementAvecCst()
             //stepper1.step(MotorStep.StepMotor1, CLOCKWISE, delaiTimer1);
 
             Serial.print("Steps moteur 1:");
-            Serial.println(stepperTab[0].deltaStep);
+            Serial.println(stepperTab[0]->deltaStep);
             Serial.print("Steps moteur 2:");
-            Serial.println(stepperTab[1].deltaStep);
+            Serial.println(stepperTab[1]->deltaStep);
             Serial.print("Steps moteur 3:");
-            Serial.println(stepperTab[2].deltaStep);
+            Serial.println(stepperTab[2]->deltaStep);
             Serial.print("Steps moteur 4:");
-            Serial.println(stepperTab[3].deltaStep);
+            Serial.println(stepperTab[3]->deltaStep);
+            Serial.print("Periode timer = ");
+            Serial.println(rpmToTickInterval(10));
 
-            if (stepperTab[0].deltaStep > 0)
-                stepper1.step(stepperTab[0].deltaStep, CLOCKWISE, rpmToTickInterval(10));
+            for (uint8_t i = 0; i<NBR_STEPPER; i++)
+                {
+                    Serial.print("Remaining steps for motor ");
+                    Serial.print(i);
+                    Serial.print(" = ");
+                    Serial.println(stepperTab[i]->getRemainingSteps());
+                }
+
+            if (stepperTab[0]->deltaStep > 0)
+                stepper1.step(stepperTab[0]->deltaStep, CLOCKWISE, rpmToTickInterval(10));
             else 
-                stepper1.step(-stepperTab[0].deltaStep, ANTICW, rpmToTickInterval(10));
-            if (stepperTab[1].deltaStep > 0) 
-                stepper2.step(stepperTab[1].deltaStep, CLOCKWISE, rpmToTickInterval(10));
+                stepper1.step(-stepperTab[0]->deltaStep, ANTICW, rpmToTickInterval(10));
+            if (stepperTab[1]->deltaStep > 0) 
+                stepper2.step(stepperTab[1]->deltaStep, CLOCKWISE, rpmToTickInterval(10));
             else 
-                stepper2.step(-stepperTab[1].deltaStep, ANTICW, rpmToTickInterval(10));
-            if (stepperTab[2].deltaStep > 0) 
-                stepper3.step(stepperTab[2].deltaStep, CLOCKWISE, rpmToTickInterval(10));
+                stepper2.step(-stepperTab[1]->deltaStep, ANTICW, rpmToTickInterval(10));
+            if (stepperTab[2]->deltaStep > 0) 
+                stepper3.step(stepperTab[2]->deltaStep, CLOCKWISE, rpmToTickInterval(10));
             else 
-                stepper3.step(-stepperTab[2].deltaStep, ANTICW, rpmToTickInterval(10));
-            if (stepperTab[3].deltaStep > 0) 
-                stepper4.step(stepperTab[3].deltaStep, CLOCKWISE, rpmToTickInterval(10));
+                stepper3.step(-stepperTab[2]->deltaStep, ANTICW, rpmToTickInterval(10));
+            if (stepperTab[3]->deltaStep > 0) 
+                stepper4.step(stepperTab[3]->deltaStep, CLOCKWISE, rpmToTickInterval(10));
             else 
-                stepper4.step(-stepperTab[3].deltaStep, ANTICW, rpmToTickInterval(10));
+                stepper4.step(-stepperTab[3]->deltaStep, ANTICW, rpmToTickInterval(10));
 
             actualCoordinates = nextCoordinates; //On part du principe que lors de la prochaine réception, on a atteint le point voulu. 
             //C'est pas très clean mais on fera aec pour l'instant.
@@ -531,17 +544,86 @@ void TestDeplacementAvecCst()
             counter++;
             Serial.print("Fini!");
         }
+        //Serial.print("remainStep: ");
+        //Serial.println(stepper2.getRemainingSteps());
     }
-
-    
 }
 
 void TestDeplacementAvecAccel()
 {
-    if (SimpleStepper::tickRefresh == 0)
+    uint8_t counter = 0;
+
+    nextCoordinates.coordX = 0.25;
+    nextCoordinates.coordY = 0.25;
+    nextCoordinates.coordZ = 0.2;
+    FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);//Fct a appeler a chaque fois que l'on recoit une nouvelle coordonnee.
+    pinMode(8, OUTPUT);
+    digitalWrite(8, LOW);
+    Serial.println("Cours Niels, COURS!");
+
+    
+    while(1)
     {
-        AccelCompute(TIME_TO_REACH);
+        //Serial.print("Periode stepper ref: ");
+        //Serial.println(stepper2.actuPeriod);
+        //Serial.print("remainStep: ");
+        //Serial.println(stepper2.getRemainingSteps());
+        //Serial.print("tickRefresh: ");
+        //Serial.println(SimpleStepper::getTickRefresh());
+        if (SimpleStepper::tickRefresh == 0)
+        {
+            //Serial.println("C");
+            digitalWrite(8, HIGH);
+            AccelCompute(counter);
+            digitalWrite(8, LOW);
+            if (counter == 0 || counter == 20)
+            {
+                Serial.print("Moteur ref : ");
+                for (int i = 0; i < NBR_STEPPER; i++)
+                {
+                    if (stepperTab[i]->isRef)
+                        Serial.println(i+1);
+                }
+                Serial.print("Steps moteur 1: ");
+                Serial.print(stepperTab[0]->deltaStep);
+                Serial.print("  Steps moteur 2:");
+                Serial.print(stepperTab[1]->deltaStep);
+                Serial.print("  Steps moteur 3:");
+                Serial.print(stepperTab[2]->deltaStep);
+                Serial.print("  Steps moteur 4:");
+                Serial.print(stepperTab[3]->deltaStep); 
+                Serial.println("-------------");
 
-    }
+            }
+            counter++; 
+        }
+        if (stepperTab[1]->isStopped())
+        {
+            Serial.println("------------------------------------------");
+            Serial.println("We change coordinate to reach");
+            nextCoordinates.coordX = 0.25;
+            nextCoordinates.coordY = -0.25;
+            nextCoordinates.coordZ = 0.2;
+            FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
+            AccelCompute(counter);
+        }
+    }   
+} 
+
+void TestDeplacementUnity()
+{
+
+    pinMode(8, OUTPUT);
+    digitalWrite(8, LOW);
+    Serial.println("Cours Niels, COURS!");
+    Serial.println("Ready");
+
+    
+    while(1)
+    {
+        if (SimpleStepper::tickRefresh == 0)
+        {
+            //AccelCompute(counter);
+        }
+    }   
 }
-

@@ -1,9 +1,10 @@
 
 #include "CommFct.h"
+#include "AccelMoteur.h"
 
 void InitComm()
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
     while (!Serial);
     Serial.setTimeout(TIMEOUTTIME);//Used for parsefloat timeout. A value juste a little higher than the time interval of the data received is probably a good value.
 
@@ -14,6 +15,7 @@ bool DataReception()
 {
     if (Serial.available())
     {
+        uint8_t counter = 0;
         char cData;
         float fCoord;
         cData = Serial.read();
@@ -23,7 +25,7 @@ bool DataReception()
                 if (Serial.available())
                 {
                     fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for X 
-                    tempCoordinates.coordX = fCoord;
+                    tempCoordinates.coordX = -fCoord/10.0;
                 }
             break;
 
@@ -42,6 +44,14 @@ bool DataReception()
                     nextCoordinates.coordX = tempCoordinates.coordX;
                     nextCoordinates.coordY = tempCoordinates.coordY;
                     nextCoordinates.coordZ = fCoord;
+                    Serial.println("Coord recue :  X = ");
+                    Serial.print(nextCoordinates.coordX);
+                    Serial.println(" Y = ");
+                    Serial.print(nextCoordinates.coordY);
+                    Serial.println(" Z = ");
+                    Serial.print(nextCoordinates.coordZ);
+                    //FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
+                    //AccelCompute(counter);
                 }
             break;
 

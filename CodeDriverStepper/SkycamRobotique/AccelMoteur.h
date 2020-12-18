@@ -13,9 +13,9 @@ extern int deltaPeriodMaxIndex;
 
 extern Steps MotorStep;
 
-extern SimpleStepper stepperTab[];
+extern SimpleStepper* stepperTab[];
 
 // Functions
-void AccelCompute(uint8_t timeToReach);
+void AccelCompute(uint8_t counter);
 
 #endif

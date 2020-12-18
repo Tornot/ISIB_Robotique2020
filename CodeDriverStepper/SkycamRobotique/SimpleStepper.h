@@ -24,7 +24,7 @@
 class SimpleStepper {
 public:
     volatile long ticksRemaining;   // remaining ticks, 2 ticks = 1 pulse = 1 microstep/step
-    static int tickRefresh;//Number of ticks remaining before compute a new speed
+    volatile static int tickRefresh;//Number of ticks remaining before compute a new speed
     //Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuSteps Cela nous fourni l'information de position
     //Une variable pour la vitesse actuelle de chaque moteur stepper.actuPeriod
     //Une variable pour la vitesse cible de chaque moteur stepper.tagetPeriod
@@ -59,7 +59,9 @@ public:
     bool isStepping();
     bool isStopped();
     bool isPaused();
-    int getTickRefresh();
+
+    static int getTickRefresh();
+    static int setTickRefresh(int setValue);
     static void ticking1();
     static void ticking2();
     static void ticking3();

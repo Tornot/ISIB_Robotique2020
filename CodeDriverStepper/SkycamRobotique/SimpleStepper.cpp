@@ -14,7 +14,7 @@ SimpleStepper *SimpleStepper::firstInstance;
 SimpleStepper *SimpleStepper::secondInstance;
 SimpleStepper *SimpleStepper::thirdInstance;
 SimpleStepper *SimpleStepper::fourthInstance;
-int SimpleStepper::tickRefresh;
+volatile int SimpleStepper::tickRefresh;
 
 SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTimer){
     switch (stepperTimer)
@@ -38,6 +38,9 @@ SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTim
     this->stepPin = Pin(steppin);
     this->stepperTimer = stepperTimer;
     this->isRef = 0; 
+    tickRefresh = 0;
+    this->actuPeriod = PERIOD_MAX;
+    this->actuSteps = 0;
 }
 
 void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder à celui que l'on veut. (du coup on évite le switch case) tabTimer[1].initalize()
@@ -106,8 +109,9 @@ bool SimpleStepper::step(long steps, uint8_t direction){
     //}
 
     this->ticksRemaining = steps * 2; //converting steps to ticks
-    
-    if(direction == HIGH)
+    //Serial.print("RemainStep: ");
+    //Serial.println(this->getRemainingSteps());
+    if(direction == LOW)
     {
       this->dirPin.setHigh();
     } 
@@ -241,6 +245,10 @@ bool SimpleStepper::isPaused(){
   return paused;
 }
 
+int SimpleStepper::setTickRefresh(int setValue)
+{
+    tickRefresh = setValue;
+}
 int SimpleStepper::getTickRefresh()
 {
     return tickRefresh;
@@ -257,8 +265,8 @@ void SimpleStepper::ticking1(){
     else if ((firstInstance->actuDir == ANTICW) && (firstInstance->ticksRemaining & 1))
         firstInstance->actuSteps--;
 
-    if (firstInstance->isRef)
-        tickRefresh--;
+    if (firstInstance->isRef && tickRefresh > 0)
+        --tickRefresh;
 }
 
 void SimpleStepper::ticking2(){
@@ -272,8 +280,8 @@ void SimpleStepper::ticking2(){
     else if ((secondInstance->actuDir == ANTICW) && (secondInstance->ticksRemaining & 1))
         secondInstance->actuSteps--;
 
-    if (secondInstance->isRef)
-        tickRefresh--;
+    if (secondInstance->isRef && tickRefresh > 0)
+        --tickRefresh;
 }
 
 void SimpleStepper::ticking3(){
@@ -287,12 +295,14 @@ void SimpleStepper::ticking3(){
     else if ((thirdInstance->actuDir == ANTICW) && (thirdInstance->ticksRemaining & 1))
         thirdInstance->actuSteps--;
 
-    if (thirdInstance->isRef)
-        tickRefresh--;
+    if (thirdInstance->isRef && tickRefresh > 0)
+        --tickRefresh;
 }
 
 void SimpleStepper::ticking4(){
-    if(fourthInstance->ticksRemaining > 0){
+    //if(fourthInstance->ticksRemaining > 0 && tickRefresh > 0) // A test!!!!
+    if(fourthInstance->ticksRemaining > 0)
+    {
         //generate high/low signal for the stepper driver
         fourthInstance->stepPin.toggleState();
         --fourthInstance->ticksRemaining;
@@ -302,8 +312,8 @@ void SimpleStepper::ticking4(){
     else if ((fourthInstance->actuDir == ANTICW) && (fourthInstance->ticksRemaining & 1))
         fourthInstance->actuSteps--;
 
-    if (fourthInstance->isRef)
-        tickRefresh--;
+    if (fourthInstance->isRef && tickRefresh > 0)
+        --tickRefresh;
 }
 
 /*TODO
