@@ -25,7 +25,7 @@ bool DataReception()
                 if (Serial.available())
                 {
                     fCoord = Serial.parseFloat(SKIP_NONE);//Get the floating point number for X 
-                    tempCoordinates.coordX = -fCoord/10.0;
+                    tempCoordinates.coordX = fCoord;
                 }
             break;
 

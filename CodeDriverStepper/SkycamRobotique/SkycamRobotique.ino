@@ -153,7 +153,9 @@ long ValAbs(long x)
 void InitDriver1()
 {
     bool initOK = 0;
-    //initOK = 1;
+    #ifdef TEST_WITHOUT_MOTOR
+        initOK = 1;
+    #endif
     while (!initOK)
     {
         Serial.println("InitDriver1");
@@ -204,7 +206,9 @@ void InitDriver1()
 void InitDriver2()
 {
     bool initOK = 0;
-    //initOK = 1;
+    #ifdef TEST_WITHOUT_MOTOR
+        initOK = 1;
+    #endif
     while (!initOK)
     {
         Serial.println("InitDriver2");
@@ -258,7 +262,9 @@ void InitDriver2()
 void InitDriver3()
 {
     bool initOK = 0;
-    //initOK = 1;
+    #ifdef TEST_WITHOUT_MOTOR
+        initOK = 1;
+    #endif
     while (!initOK)
     {
         Serial.println("InitDriver3");
@@ -312,7 +318,9 @@ void InitDriver3()
 void InitDriver4()
 {
     bool initOK = 0;
-    //initOK = 1;
+    #ifdef TEST_WITHOUT_MOTOR
+        initOK = 1;
+    #endif
     while (!initOK)
     {
         Serial.println("InitDriver4");

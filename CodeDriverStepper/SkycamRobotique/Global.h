@@ -3,6 +3,14 @@
 #define GLOBAL_H
 #include "SimpleStepper.h"
 
+/*******************************************************************
+*******************************************************************
+Une partie des variables globales sont aussi définies dans SkycamRobotique.ino. Il faudrait les déplacer ici en s'assurant que le code continue de compiler et de fonctionner correctement.
+*******************************************************************
+*******************************************************************/
+#define TEST_WITHOUT_MOTOR
+
+
 #define MOTORSTEPS 1600        // 360/1.8 = 200 full steps * 256 microsteps = number of steps per revolution 
 #define CLOCKWISE 1             // Rotation of the stepper motor, reverse if it is swapped
 #define ANTICW 0                // Rotation of the stepper motor, reverse if it is swapped
