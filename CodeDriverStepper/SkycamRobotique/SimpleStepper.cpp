@@ -39,7 +39,7 @@ SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTim
     this->stepperTimer = stepperTimer;
     this->isRef = 0; 
     tickRefresh = 0;
-    this->actuPeriod = PERIOD_MAX;
+    //this->nextPeriod = PERIOD_MAX;
     this->actuSteps = 0;
 }
 
@@ -104,13 +104,11 @@ void SimpleStepper::setPulse(long pulse){
 }
 
 bool SimpleStepper::step(long steps, uint8_t direction){
-    //if(this->isStepping()){
-    //    return false;
-    //}
+    //if(this->isStepping()){   //This bit of code was not commented in the 
+    //    return false;         //original library, but we need to comment it
+    //}                         //for our needs
 
     this->ticksRemaining = steps * 2; //converting steps to ticks
-    //Serial.print("RemainStep: ");
-    //Serial.println(this->getRemainingSteps());
     if(direction == LOW)
     {
       this->dirPin.setHigh();
@@ -118,7 +116,6 @@ bool SimpleStepper::step(long steps, uint8_t direction){
     else 
     {
        this->dirPin.setLow();
-       
     }
     this->actuDir = direction;
     return true;
@@ -131,7 +128,6 @@ bool SimpleStepper::step(long steps, uint8_t direction, long pulse){
 
     this->resume();
     this->setPulse(pulse);
- 
     return  this->step(steps, direction);
 }
 
@@ -161,14 +157,14 @@ long SimpleStepper::stop(){
             break;
     }
     
-    // if odd we do one last tick
+    // if odd we do one last tick to set the line at 0
     if(ticksRemaining & 1){
         ticksRemaining = 1;
     } else{
         ticksRemaining = 0;
     }
 
-     switch (this->stepperTimer)
+    switch (this->stepperTimer)
     {
         case 1:
             Timer1.start();
@@ -212,25 +208,25 @@ void SimpleStepper::pause(){
 
 void SimpleStepper::resume(){
     if(paused){
-    switch (this->stepperTimer)
-    {
-        case 1:
-            Timer1.start();
-            break;
-        case 3:
-            Timer3.start();
-            break;
-        case 4:
-            Timer4.start();
-            break;
-        case 5:
-            Timer5.start();
-            break;
-        default:
-            break;
+        switch (this->stepperTimer)
+        {
+            case 1:
+                Timer1.start();
+                break;
+            case 3:
+                Timer3.start();
+                break;
+            case 4:
+                Timer4.start();
+                break;
+            case 5:
+                Timer5.start();
+                break;
+            default:
+                break;
+        }
+        paused = false;
     }
-    paused = false;
-  }
 }
 
 bool SimpleStepper::isStepping(){
@@ -317,10 +313,7 @@ void SimpleStepper::ticking4(){
 }
 
 /*TODO
-- Implémenter la actuSteps dans les callback + connaitre la direction (pour savoir si on incrémente ou décrémente)
-- Refaire les calculs tous les NBR_TICK_BETWEEN_COMPUTE
-- mettre la periode à la fin de AccelMoteur.cpp (appel fonction step())
-- Problème de signe à régler
 -!!! On va avoir un pb quand on change de direction, car il faut absolument finir le pas en cours avant (ou pas, vu qu'on ne fait pas de toogle, 
     on serait amené à mettre la broche à 1 alors qu'elle l'est déjà, ça pourrait peut-être compenser). En gros, c'est à vérifier!!
+    => il faudrait sûrement s'assurer que toutes les step pins soient à 0 au moment où on change les timers. Cela permettrait d'éviter le problème
 */

@@ -16,11 +16,6 @@ Par contre, on pourrait actualiser simplement en faisant une soustraction de act
 #include "TimerFour.h"
 #include "TimerFive.h"
 
-/*
-Recherche de librairie de contrôle de moteur via interrupt : https://forum.arduino.cc/index.php?topic=248359.0 (lien à check mais pas sûr qu'il soit utile)
-https://www.forward.com.au/pfod/Robots/SpeedStepper/index.html
-*/
-
 //SPI pin: CLK = 52, MISO = 50, MOSI = 51
 /*
 const uint8_t DirPin1 = 2;
@@ -51,9 +46,6 @@ const uint8_t DirPin4 = 22;
 const uint8_t StepPin4 = 24;
 const uint8_t CSPin4 = 26;
 
-
-
-
 HighPowerStepperDriver sd;
 
 SimpleStepper stepper1(DirPin1, StepPin1, 1);
@@ -62,7 +54,6 @@ SimpleStepper stepper3(DirPin3, StepPin3, 4);
 SimpleStepper stepper4(DirPin4, StepPin4, 5);
 uint8_t counter = 0;
 
-//SimpleStepper* stepperTab[4] = {stepper1, stepper2, stepper3, stepper4};
 SimpleStepper* stepperTab[4] = {&stepper1, &stepper2, &stepper3, &stepper4};
 
 Coordinates nextCoordinates =   {0.0,0.0,0.7};
@@ -71,10 +62,7 @@ Coordinates tempCoordinates =   {0.0,0.0,0.7};
 Coordinates initCoordinates =   {0.0,0.0,0.7};
 Steps TargetMotorStep = {0,0,0,0};
 
-//Steps MotorStep = {0,0,0,0}; //No more in use, need to clean it with the declaration of the structure
-//double A = 773000.0;//Structure fait ~1m*1m*1m à raison de 773pas/mm avec 256µstep/step
-//double B = 773000.0;
-double A = 1.0;
+double A = 1.0; // ground dimensions
 double B = 1.0;
 
 int deltaStepMaxIndex;
@@ -110,23 +98,6 @@ void setup()
     Serial.println("Ready");
 }
 
-/*
-void loop()
-{
-  //DataReception (coordonnées, formattée de manière 'X', float, 'Y', float, 'Z', float)
-  DataReception();
-
-  //Compute speed and acceleration
-  //=> IN: coordinates, from a tab
-  AccelCompute(&coordinates);
-
-
-  //Modification of timer values => use a variable wich the timer will take at each tick
-  TimerModif();
-
-}
-*/
-
 void loop()
 {
     //TestTourner4Moteurs();
@@ -135,12 +106,10 @@ void loop()
     //TestDeplacementUnity();
 }
 
-//rpm to stepper tick in micro seconds
+//rpm to stepper tick in micro seconds. It was used for the firt tests in function TestTourner4Moteurs()
 long rpmToTickInterval(long targetRPM){
-    // rotation per sec = targetRPM/60
-    float stepsPerSecond = (float) targetRPM/60 * MOTORSTEPS;
+    float stepsPerSecond = (float) targetRPM/60 * MOTORSTEPS; // rotation per sec = targetRPM/60
     long pulseInMicroseconds = (long) (1000000L/stepsPerSecond) / 2;
-
     return pulseInMicroseconds;
 }
 
@@ -169,8 +138,7 @@ void InitDriver1()
 
         // Give the driver some time to power up.
         delay(1);
-        // Reset the driver to its default settings and clear latched status
-        // conditions.
+        // Reset the driver to its default settings and clear latched status conditions.
         sd.resetSettings();
         sd.clearStatus();
 
@@ -201,7 +169,6 @@ void InitDriver1()
             Serial.println(sd.readStatus());
         }
     }
-    
 }
 void InitDriver2()
 {
@@ -223,8 +190,7 @@ void InitDriver2()
         // Give the driver some time to power up.
         delay(1);
 
-        // Reset the driver to its default settings and clear latched status
-        // conditions.
+        // Reset the driver to its default settings and clear latched status conditions.
         sd.resetSettings();
         sd.clearStatus();
 
@@ -256,9 +222,7 @@ void InitDriver2()
             Serial.println(sd.readStatus());
         }
     }
-    
 }
-
 void InitDriver3()
 {
     bool initOK = 0;
@@ -279,8 +243,7 @@ void InitDriver3()
         // Give the driver some time to power up.
         delay(1);
 
-        // Reset the driver to its default settings and clear latched status
-        // conditions.
+        // Reset the driver to its default settings and clear latched status conditions.
         sd.resetSettings();
         sd.clearStatus();
 
@@ -312,9 +275,7 @@ void InitDriver3()
             Serial.println(sd.readStatus());
         }
     }
-    
 }
-
 void InitDriver4()
 {
     bool initOK = 0;
@@ -335,8 +296,7 @@ void InitDriver4()
         // Give the driver some time to power up.
         delay(1);
 
-        // Reset the driver to its default settings and clear latched status
-        // conditions.
+        // Reset the driver to its default settings and clear latched status conditions.
         sd.resetSettings();
         sd.clearStatus();
 
@@ -368,68 +328,63 @@ void InitDriver4()
             Serial.println(sd.readStatus());
         }
     }
-    
 }
-
-
-
-
 
 void TestTourner4Moteurs()
 {
-        //once the stepper finished stepping to remaining ticks/steps
-    if(stepper1.isStopped()){
-
-    switch (counter)
+    //once the stepper finished stepping to remaining ticks/steps
+    if(stepper1.isStopped())
     {
-        case 0:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
-            stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
-            stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
-        break;
-        case 1:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
-        break;
-        case 2:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
-        break;
-        case 3: 
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(35));
-        break;
-        case 4:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(35));
-        break;
-        case 5:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
-        break;
-        case 6:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
-        break;
-        case 7:
-            stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
-        break;
-        case 8:
-            stepper1.step(MOTORSTEPS/2, CLOCKWISE, rpmToTickInterval(5));
-        break;
-        case 9:
-            stepper1.step(MOTORSTEPS/2, ANTICW, rpmToTickInterval(5));
-        break;
-        case 10:
-            stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
-        break;
-        case 11:
-            stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(20));
-        break;
-        case 12:
-            stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(30));
-        break;
-        default:
-        break;
+        switch (counter)
+        {
+            case 0:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
+                stepper3.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
+                stepper4.step(MOTORSTEPS*5, CLOCKWISE, rpmToTickInterval(10));
+            break;
+            case 1:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+            break;
+            case 2:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
+            break;
+            case 3: 
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(35));
+            break;
+            case 4:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(35));
+            break;
+            case 5:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(30));
+            break;
+            case 6:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(20));
+            break;
+            case 7:
+                stepper1.step(MOTORSTEPS, CLOCKWISE, rpmToTickInterval(10));
+            break;
+            case 8:
+                stepper1.step(MOTORSTEPS/2, CLOCKWISE, rpmToTickInterval(5));
+            break;
+            case 9:
+                stepper1.step(MOTORSTEPS/2, ANTICW, rpmToTickInterval(5));
+            break;
+            case 10:
+                stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(10));
+            break;
+            case 11:
+                stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(20));
+            break;
+            case 12:
+                stepper1.step(MOTORSTEPS, ANTICW, rpmToTickInterval(30));
+            break;
+            default:
+            break;
+        }
+        ++counter;
     }
-    ++counter;
-  }
-  if(stepper2.isStopped()){
-
+  if(stepper2.isStopped())
+  {
     switch (counter)
     {
         case 0:
@@ -476,7 +431,8 @@ void TestTourner4Moteurs()
     }
     //++counter;    //In comment for now because otherwisewe hae 2 increment of counter
   }
-  if(counter >= 14){
+  if(counter >= 14)
+  {
     //stop whatever the stepper is doing
     stepper1.stop();
     stepper2.stop();
@@ -494,7 +450,7 @@ void TestDeplacementAvecCst()
     actualCoordinates.coordY = 0.0; 
     actualCoordinates.coordZ = 0.7;
     uint8_t counter = 0;
-    Serial.println("Cours Niels, COURS!");
+    Serial.println("Depart");
     while(1)
     {
         if (counter == 0) 
@@ -547,7 +503,7 @@ void TestDeplacementAvecCst()
                 stepper4.step(-stepperTab[3]->deltaStep, ANTICW, rpmToTickInterval(10));
 
             actualCoordinates = nextCoordinates; //On part du principe que lors de la prochaine réception, on a atteint le point voulu. 
-            //C'est pas très clean mais on fera aec pour l'instant.
+            //C'est pas très clean mais on fera avec pour l'instant.
 
             counter++;
             Serial.print("Fini!");
@@ -560,16 +516,15 @@ void TestDeplacementAvecCst()
 void TestDeplacementAvecAccel()
 {
     uint8_t counter = 0;
-
     nextCoordinates.coordX = 0.25;
     nextCoordinates.coordY = 0.25;
     nextCoordinates.coordZ = 0.2;
+
     FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);//Fct a appeler a chaque fois que l'on recoit une nouvelle coordonnee.
     pinMode(8, OUTPUT);
     digitalWrite(8, LOW);
-    Serial.println("Cours Niels, COURS!");
+    Serial.println("Depart");
 
-    
     while(1)
     {
         //Serial.print("Periode stepper ref: ");
@@ -582,7 +537,7 @@ void TestDeplacementAvecAccel()
         {
             //Serial.println("C");
             digitalWrite(8, HIGH);
-            AccelCompute(counter);
+            AccelCompute();
             digitalWrite(8, LOW);
             if (counter == 0 || counter == 20)
             {
@@ -613,25 +568,23 @@ void TestDeplacementAvecAccel()
             nextCoordinates.coordY = -0.25;
             nextCoordinates.coordZ = 0.2;
             FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
-            AccelCompute(counter);
+            AccelCompute();
         }
     }   
 } 
 
 void TestDeplacementUnity()
 {
-
     pinMode(8, OUTPUT);
     digitalWrite(8, LOW);
     Serial.println("Cours Niels, COURS!");
     Serial.println("Ready");
 
-    
     while(1)
     {
         if (SimpleStepper::tickRefresh == 0)
         {
-            //AccelCompute(counter);
+            //AccelCompute();
         }
     }   
 }

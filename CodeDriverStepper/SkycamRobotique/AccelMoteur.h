@@ -5,17 +5,14 @@
 #include "Global.h"
 #include "SimpleStepper.h"
 
-
 // Variables
 extern int deltaStepMaxIndex;
 extern int deltaPeriodMaxIndex;
 
-
 extern Steps MotorStep;
-
 extern SimpleStepper* stepperTab[];
 
 // Functions
-void AccelCompute(uint8_t counter);
+void AccelCompute();
 
 #endif

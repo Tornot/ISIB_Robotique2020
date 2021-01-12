@@ -17,7 +17,6 @@
 #include "TimerFour.h"
 #include "TimerFive.h"
 
-
 /*
  * Simple Stepper class.
  */
@@ -25,17 +24,12 @@ class SimpleStepper {
 public:
     volatile long ticksRemaining;   // remaining ticks, 2 ticks = 1 pulse = 1 microstep/step
     volatile static int tickRefresh;//Number of ticks remaining before compute a new speed
-    //Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuSteps Cela nous fourni l'information de position
-    //Une variable pour la vitesse actuelle de chaque moteur stepper.actuPeriod
-    //Une variable pour la vitesse cible de chaque moteur stepper.tagetPeriod
-    //Une variable pour la prochaine vitesse de chaque moteur stepper.nextPeriod
-    //Une variable pour le delta période du timer de chaque moteur stepper.deltaPeriod
     long actuSteps;
     long deltaStep;
     _Bool actuDir;  //0 = ANTICW, 1 = CLOCKWISE
     long actuPeriod;
     long targetPeriod;
-    long nextPeriod;
+    //long nextPeriod; //Enlevée récemment, tester si tout fonctionne bien avant de l'enlever définitivement mais à priori derait pas poser soucis
     long deltaPeriod;
     _Bool isRef;
 

@@ -1,28 +1,11 @@
 #include "AccelMoteur.h"
 
-
-
-
-
-//Une variable pour chaque moteur qui contient le nombre de pas qu'il a effectué : stepper.actuStep Cela nous fourni l'information de position (on a implémenté actuTicks qui veut 2*actuStep)
-//Une variable pour connaitre l'écart entre la consigne en step et le nombre de step actuel stepper.deltaStep
-//Une variable pour la vitesse actuelle de chaque moteur stepper.actuPeriod
-//Une variable pour la vitesse cible de chaque moteur stepper.tagetPeriod
-//Une variable pour la prochaine vitesse de chaque moteur stepper.nextPeriod
-//Une variable pour le delta période du timer de chaque moteur stepper.deltaPeriod
-//Une variable pour le delta période max : deltaPeriodMax
-//Une variable qui indique au moteur si il est la ref ou pas
-
-
-//Une variable K, un nombre de pas restant en dessous duquel on freine
-//Une variable deltaStepMax qui est la plus grande distance à parcourir
-//
-
-
-
-void AccelCompute(uint8_t counter)
+//AccelCompute s'occupe de calculer les timers associés à chaque moteur afin de régler leur vitesse.
+//Cette fonction ne retourne rien, tout est fait une fois que son appel est terminé.
+//Elle doit être appelée tout les NBR_TICK_BETWEEN_COMPUTE afin d'être efficace.
+void AccelCompute()
 {
-    //Calculer le deltaStep pour chaque moteur
+//Calcule le nombre de pas à réaliser pour chaque moteur (met à jour stepperTab[x]->deltaStep)
     GetTargetDeltaSteps();
 
 //Défini la ref et le maximum de pas à faire
@@ -38,8 +21,7 @@ void AccelCompute(uint8_t counter)
         }
     }
 
-
-//Si deltaStep_max = 0 on arrête tout!
+//Si il n'y a plus de pas à faire, on arrête tout! (deltaStep_max = 0)
     if(stepperTab[deltaStepMaxIndex]->deltaStep < (NBR_TICK_BETWEEN_COMPUTE/2))
     {
         for (int i = 0; i < NBR_STEPPER; i++)
@@ -49,7 +31,6 @@ void AccelCompute(uint8_t counter)
     }
 
 //On freine si il reste peu de pas à faire.
-    
     float targetPeriodBrakeRatio = 1.0;
     if(abs(stepperTab[deltaStepMaxIndex]->deltaStep) < BREAK_THRESHOLD_DELTA_STEP)
     {
@@ -58,14 +39,12 @@ void AccelCompute(uint8_t counter)
         // tous les autres steppers devront être diminués de ce facteur proportionnellement
     }
 
-//AJOUT RECENT    
-//On trouve le rapport de vitesse target de chaque moteur par rapport à la ref (ratio > 1)
+//On trouve le rapport de vitesse target de chaque moteur par rapport à la ref (ratio > 1 car période)
     float targetPeriodMinRatio[4] = {1.0, 1.0, 1.0, 1.0};
     for(int i = 0; i < NBR_STEPPER; i++)
     {
         targetPeriodMinRatio[i] = abs((float)stepperTab[deltaStepMaxIndex]->deltaStep / (float)stepperTab[i]->deltaStep);
     }
-//FIN AJOUT RECENT
 
 //On trouve un delta de période pour chaque moteur.
     for (int i = 0; i < NBR_STEPPER; i++)
@@ -78,11 +57,6 @@ void AccelCompute(uint8_t counter)
     deltaPeriodMaxIndex = 0;
     for(int i = 0; i < NBR_STEPPER; i++ )
     {
-        //Serial.print("For nbr : ");
-        //Serial.println(i);
-        //Serial.println(stepperTab[i]->deltaPeriod);
-        //Serial.println(stepperTab[i]->deltaStep);
-        //Serial.println(stepperTab[i]->actuSteps);
         if( abs(stepperTab[deltaPeriodMaxIndex]->deltaPeriod) <= abs(stepperTab[i]->deltaPeriod) )
         {
             //Serial.print("Test : ");
@@ -93,19 +67,19 @@ void AccelCompute(uint8_t counter)
         }
     }
 
-//On réduit les variations de vitesse par rapport à celui qui a la plus grande variation
+//On réduit les variations de vitesse par rapport à celui qui a la plus grande variation et on modifie les périodes de chaque stepper.
+//Cela permet d'avoir des accélération différentes pour chaque moteur et qu'ils atteignent leur vitesse de croisière en même temps.
     float satDeltaPeriodRatio = 1.0;
     if(abs(stepperTab[deltaPeriodMaxIndex]->deltaPeriod) > MAXIMUM_DELTA_PERIOD)
     { //si on fait un saut de période trop grand (grande différence de vitesse)
         satDeltaPeriodRatio = (float)MAXIMUM_DELTA_PERIOD / (float)abs(stepperTab[deltaPeriodMaxIndex]->deltaPeriod);
     }
-//On modifie les périodes de chaque stepper
     for (int i = 0; i < NBR_STEPPER; i++)
     {
         stepperTab[i]->actuPeriod += (long)((float)stepperTab[i]->deltaPeriod * satDeltaPeriodRatio);
     }
 
-//On charge les valeurs dans les timers
+//On charge les valeurs dans les timers et on reset le nombre de ticks à réaliser avant recalculer les vitesses.
     for (int i = 0; i < NBR_STEPPER; i++)
     {
         if(stepperTab[i]->deltaStep >= 0)
@@ -115,8 +89,6 @@ void AccelCompute(uint8_t counter)
     }
     SimpleStepper::setTickRefresh(NBR_TICK_BETWEEN_COMPUTE);
 }
-
-
 
 //Ce que l'on veut, c'est que chaque moteur aille à une fraction de la vitesse du moteur le plus rapide. Il faut donc calculer le nombre
 //de pas de chaque moteur, définir la vitesse target de celui qui doit en faire le plus (la ref) et réduire la vitesse target des autres de manière proportionnelle

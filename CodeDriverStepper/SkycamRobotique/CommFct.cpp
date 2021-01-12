@@ -1,4 +1,3 @@
-
 #include "CommFct.h"
 #include "AccelMoteur.h"
 
@@ -6,8 +5,7 @@ void InitComm()
 {
     Serial.begin(115200);
     while (!Serial);
-    Serial.setTimeout(TIMEOUTTIME);//Used for parsefloat timeout. A value juste a little higher than the time interval of the data received is probably a good value.
-
+    Serial.setTimeout(TIMEOUTTIME);//Used for parsefloat timeout. Value in ms. A value juste a little higher than the time interval of the data received is probably a good value.
     SPI.begin();
 }
 
