@@ -79,7 +79,7 @@ void AccelCompute()
         stepperTab[i]->actuPeriod += (long)((float)stepperTab[i]->deltaPeriod * satDeltaPeriodRatio);
     }
 
-//On charge les valeurs dans les timers et on reset le nombre de ticks à réaliser avant recalculer les vitesses.
+//On charge les valeurs dans les timers et on reset le nombre de ticks à réaliser avant de recalculer les vitesses.
     for (int i = 0; i < NBR_STEPPER; i++)
     {
         if(stepperTab[i]->deltaStep >= 0)

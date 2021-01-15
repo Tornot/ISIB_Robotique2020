@@ -43,8 +43,8 @@ SimpleStepper::SimpleStepper(uint8_t dirpin, uint8_t steppin, uint8_t stepperTim
     this->actuSteps = 0;
 }
 
-void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder à celui que l'on veut. (du coup on évite le switch case) tabTimer[1].initalize()
-    dirPin.setOutput();
+void SimpleStepper::init(){     //Utiliser un tableau de timer pour accéder 
+    dirPin.setOutput();         //à celui que l'on veut. (du coup on évite le switch case) tabTimer[1].initalize()
     stepPin.setOutput();
 
     switch (this->stepperTimer)
@@ -112,8 +112,8 @@ bool SimpleStepper::step(long steps, uint8_t direction){
     if(direction == LOW)
     {
       this->dirPin.setHigh();
-    } 
-    else 
+    }
+    else
     {
        this->dirPin.setLow();
     }

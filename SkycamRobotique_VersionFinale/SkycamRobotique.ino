@@ -32,19 +32,19 @@ const uint8_t DirPin4 = 23;
 const uint8_t StepPin4 = 25;
 const uint8_t CSPin4 = 27;
 */
-const uint8_t DirPin1 = 2;
-const uint8_t StepPin1 = 3;
-const uint8_t CSPin1 = 4;
-const uint8_t DirPin2 = 23;
-const uint8_t StepPin2 = 25;
-const uint8_t CSPin2 = 27;
+const uint8_t DirPin1 = A1;
+const uint8_t StepPin1 = A0;
+const uint8_t CSPin1 = A2;
+const uint8_t DirPin2 = 6;
+const uint8_t StepPin2 = 5;
+const uint8_t CSPin2 = 7;
 //!!!!!Pins for motors 3 and 4 are not defined!!!
-const uint8_t DirPin3 = 5;
-const uint8_t StepPin3 = 6;
-const uint8_t CSPin3 = 7;
-const uint8_t DirPin4 = 22;
-const uint8_t StepPin4 = 24;
-const uint8_t CSPin4 = 26;
+const uint8_t DirPin3 = A4;
+const uint8_t StepPin3 = A3;
+const uint8_t CSPin3 = A5;
+const uint8_t DirPin4 = 3;
+const uint8_t StepPin4 = 2;
+const uint8_t CSPin4 = 4;
 
 HighPowerStepperDriver sd;
 
@@ -516,13 +516,14 @@ void TestDeplacementAvecCst()
 void TestDeplacementAvecAccel()
 {
     uint8_t counter = 0;
+    uint8_t counter2 = 0;
     nextCoordinates.coordX = 0.25;
     nextCoordinates.coordY = 0.25;
     nextCoordinates.coordZ = 0.2;
 
     FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);//Fct a appeler a chaque fois que l'on recoit une nouvelle coordonnee.
-    pinMode(8, OUTPUT);
-    digitalWrite(8, LOW);
+    pinMode(PIN_TEST, OUTPUT);
+    digitalWrite(PIN_TEST, LOW);
     Serial.println("Depart");
 
     while(1)
@@ -536,9 +537,9 @@ void TestDeplacementAvecAccel()
         if (SimpleStepper::tickRefresh == 0)
         {
             //Serial.println("C");
-            digitalWrite(8, HIGH);
+            digitalWrite(PIN_TEST, HIGH);
             AccelCompute();
-            digitalWrite(8, LOW);
+            digitalWrite(PIN_TEST, LOW);
             if (counter == 0 || counter == 20)
             {
                 Serial.print("Moteur ref : ");
@@ -556,17 +557,29 @@ void TestDeplacementAvecAccel()
                 Serial.print("  Steps moteur 4:");
                 Serial.print(stepperTab[3]->deltaStep); 
                 Serial.println("-------------");
-
             }
             counter++; 
         }
-        if (stepperTab[1]->isStopped())
+        if (stepperTab[1]->isStopped() && (counter2 == 0))
         {
+            counter2++;
             Serial.println("------------------------------------------");
-            Serial.println("We change coordinate to reach");
+            Serial.println("Change coord 1");
             nextCoordinates.coordX = 0.25;
             nextCoordinates.coordY = -0.25;
             nextCoordinates.coordZ = 0.2;
+            FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
+            AccelCompute();
+        }
+
+         if (stepperTab[1]->isStopped() && (counter2 == 1))
+        {
+            counter2++;
+            Serial.println("------------------------------------------");
+            Serial.println("Change coord 2");
+            nextCoordinates.coordX = 0.0;
+            nextCoordinates.coordY = 0.0;
+            nextCoordinates.coordZ = 0.7;
             FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
             AccelCompute();
         }
@@ -575,16 +588,17 @@ void TestDeplacementAvecAccel()
 
 void TestDeplacementUnity()
 {
-    pinMode(8, OUTPUT);
-    digitalWrite(8, LOW);
-    Serial.println("Cours Niels, COURS!");
+    FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
+    pinMode(PIN_TEST, OUTPUT);
+    digitalWrite(PIN_TEST, LOW);
+
     Serial.println("Ready");
 
     while(1)
     {
         if (SimpleStepper::tickRefresh == 0)
         {
-            //AccelCompute();
+            AccelCompute();
         }
     }   
 }

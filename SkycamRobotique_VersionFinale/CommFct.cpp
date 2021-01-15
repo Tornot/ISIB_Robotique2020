@@ -48,8 +48,8 @@ bool DataReception()
                     Serial.print(nextCoordinates.coordY);
                     Serial.println(" Z = ");
                     Serial.print(nextCoordinates.coordZ);
-                    //FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
-                    //AccelCompute(counter);
+                    FonctionCoord2Steps(A,B,initCoordinates,nextCoordinates);
+                    AccelCompute();
                 }
             break;
 
